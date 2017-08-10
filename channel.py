@@ -9,7 +9,7 @@
 import socket
 import select
 import sys
-from packet import Packet
+import packet
 import random as rand
 
 
@@ -18,7 +18,7 @@ DROP_RATE = 0
 
 
 def process_packet(data):
-    p = Packet(0,0,0,0,0)
+    p = packet.Packet(0,0,0,0,0)
     p.byte_deconversion(data)
     if p.magic_no != 0x497E: #drop if magic number different
         return None
@@ -75,7 +75,7 @@ def main(args):
         print("An IO Error occurred trying to create recv_in")
         sys.exit()
     
-    out = raw_input("Please start sender and reciever and then press enter")
+    out = input("Please start sender and reciever and then press enter")
     
     try:
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

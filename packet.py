@@ -10,6 +10,8 @@
        byte_conversion()
        byte_deconversion()
 """
+PTYPE_DATA = 0
+PTYPE_ACK = 1
 
 class Packet:
     
@@ -27,12 +29,13 @@ class Packet:
         conv += str(self.seq_no)
         conv += "0" * (len(str(self.data_len)) - 3) + str(self.data_len)
         conv += str(self.data)
-        return bytes(conv)
+        return bytes(conv, "utf-8")
         
     
     """Sets the fields of this packet to that of p"""
     def byte_deconversion(self, p):
         p = str(p)
+        p = p[2:-1]
         self.magic_no = int(p[:5])
         self.packet_type = int(p[5])
         self.seq_no = int(p[6])
