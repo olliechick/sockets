@@ -3,9 +3,12 @@
    A class to represent a packet of information.
    
    Author: Samuel Pell
+   Date Modified: 10/08/17 (DD/MM/YY)
    
    Contains:
        __init__
+       byte_conversion()
+       byte_deconversion()
 """
 
 class Packet:
@@ -22,7 +25,7 @@ class Packet:
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
-        conv += "0"*(len(str(self.data_len)) - 3) + str(self.data_len)
+        conv += "0" * (len(str(self.data_len)) - 3) + str(self.data_len)
         conv += str(self.data)
         return bytes(conv)
         
