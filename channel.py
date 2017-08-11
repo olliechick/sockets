@@ -3,7 +3,7 @@
    A program for the COSC264-17S2 Assignment
    
    Author: Samuel Pell
-   Date Modified: 10/08/17 (DD/MM/YY)
+   Date Modified: 12/08/17 (DD/MM/YY)
 """
 
 import socket
