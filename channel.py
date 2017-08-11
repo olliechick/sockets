@@ -10,7 +10,7 @@ import socket
 import select
 import sys
 import packet
-import random as rand
+import random
 
 
 BIT_ERR_RATE = 0.1
@@ -22,10 +22,10 @@ def process_packet(data):
     p.byte_deconversion(data)
     if p.magic_no != 0x497E: #drop if magic number different
         return None
-    elif rand.uniform(0, 1) < DROP_RATE: #drop by random chance
+    elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
         return None
-    elif rand.uniform(0,1) < BIT_ERR_RATE: #create a bit error
-        p.data_len += int(rand.uniform(1, 10))
+    elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
+        p.data_len += int(random.uniform(1, 10))
     
     return p.byte_conversion() #return the packets byte conversion
 
@@ -33,14 +33,18 @@ def process_packet(data):
 def main_loop(sender_in, sender_out, recv_in, recv_out):
     while True:
         readable, _, _ = select.select([sender_in, recv_in], [], [])
+        
         for s in readable:
             conn, addr = s.accept()
             data = conn.recv(1024)
+            
             data_to_forward = process_packet(data)
-            if s.getsockname() == sender_in.getsockname(): #came from sender send to reciever
-                recv_out.sendall(data_to_forward)
-            else: #else send to sender
-                sender_out.sendall(data_to_forward)
+            
+            if data_to_forward != None: #if the packet isn't dropped
+                if s.getsockname() == sender_in.getsockname(): #came from sender send to reciever
+                    recv_out.sendall(data_to_forward)
+                else: #else send to sender
+                    sender_out.sendall(data_to_forward)
 
 def main(args):
     #Port numbers for this program
