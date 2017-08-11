@@ -20,6 +20,7 @@ DROP_RATE = 0
 def process_packet(data):
     p = packet.Packet(0,0,0,0,0)
     p.byte_deconversion(data)
+    print(p.data)
     if p.magic_no != 0x497E: #drop if magic number different
         return None
     elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
@@ -41,6 +42,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
             data_to_forward = process_packet(data)
             
             if data_to_forward != None: #if the packet isn't dropped
+                print("Sending data back")
                 if s.getsockname() == sender_in.getsockname(): #came from sender send to reciever
                     recv_out.sendall(data_to_forward)
                 else: #else send to sender
@@ -79,30 +81,29 @@ def main(args):
         print("An IO Error occurred trying to create recv_in")
         sys.exit()
     
-    out = input("Please start sender and reciever and then press enter")
+    input("Please start sender and reciever then press enter")
+    #try:
+        #sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #sender_out.bind(("", sender_out_port))
+        #sender_out.connect(("", sender))
+        #print("Started sender_out")
+    #except IOError:
+        #print("An IO Error occurred trying to connect to sender")
+        #sys.exit()
     
-    try:
-        sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sender_out.bind(("", sender_out_port))
-        sender_out.connect(("", sender))
-        print("Started sender_out")
-    except IOError:
-        print("An IO Error occurred trying to connect to sender")
-        sys.exit()
-    
-    try:    
+    try: 
         recv_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         recv_out.bind(("", recv_out_port))
         recv_out.connect(("", recv))
         print("Started recv_out")
     except IOError:
-        print("An IO Error occurred trying to connect to reciever")
+        print("An IO Error occurred trying to connect to sender")
         sys.exit()
         
-    main_loop()
+    main_loop(sender_in, 12, recv_in, recv_out)
 
 
 if __name__ == "__main__":
     ##args = sys.argv[1:]
-    args = [15620, 15646, 15465, 15466, 17968, 14567, 12]
+    args = [15620, 15621, 15622, 15623, 15630, 15640, 1]
     main(args)
