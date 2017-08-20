@@ -19,11 +19,11 @@ def main(args):
         channel_in_port = int(args[3])
         filename = args[4]
     except:
-        print("Usage: {} <in_port> <out_port> <channel_in_port> <filename>".format(args[0]))
+        print("Usage: python3 {} <in_port> <out_port> <channel_in_port> <filename>".format(args[0]))
     else:
         for port in [in_port, out_port, channel_in_port]:
             if port < 1024 or port > 64000:
-                print("All port numbers should be in the range [1024, 64000].")
+                print("All port numbers should be intergers in the range [1024, 64000].")
                 return        
             
     # Create sockets
@@ -62,7 +62,7 @@ def main(args):
     
     # Main loop
     while True:
-        print("\n\n\nWaiting...", flush = True)
+        print("\n\n\nWaiting...", flush=True)
         readable, _, _ = select.select([socket_in], [], [])
         #got a response
         print('got a response')

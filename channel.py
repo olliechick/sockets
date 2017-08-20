@@ -86,7 +86,7 @@ def main(args):
         #Probability of dropping a packet
         DROP_RATE = float(args[7])
     except:
-        print("""Usage: {} <sender_in_port> <sender_out_port> <recv_in_port> <recv_out_port> <sender> <recv> <drop_rate>""".format(args[0]))
+        print("""Usage: python3 {} <sender_in_port> <sender_out_port> <recv_in_port> <recv_out_port> <sender> <recv> <drop_rate>""".format(args[0]))
         return
     
     # Check that ports are in the valid range
