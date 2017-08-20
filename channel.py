@@ -2,8 +2,8 @@
    channel
    A program for the COSC264-17S2 Assignment
    
-   Author: Samuel Pell
-   Date Modified: 12/08/17 (DD/MM/YY)
+   Authors: Samuel Pell and Ollie Chick
+   Date Modified: 20 August 2017
 """
 
 import socket
@@ -18,8 +18,8 @@ DROP_RATE = 0
 
 
 def process_packet(data):
-    """Process an input packet and randomly drop it or change it's header"""
-    p = packet.Packet(0,0,0,0,0)
+    """Process an input packet and randomly drop it or change its header"""
+    p = packet.Packet()
     p.byte_deconversion(data)
     print(p.data)
     if p.magic_no != 0x497E: #drop if magic number different
@@ -63,20 +63,19 @@ def main(args):
     """
     try:
         #Port numbers for this program
-        sender_in_port = int(args[0])
-        sender_out_port = int(args[1])
-        recv_in_port = int(args[2])
-        recv_out_port = int(args[3])
+        sender_in_port = int(args[1])
+        sender_out_port = int(args[2])
+        recv_in_port = int(args[3])
+        recv_out_port = int(args[4])
         
         #Port numbers of the sender and reciver
-        sender = int(args[4])
-        recv = int(args[5])
+        sender = int(args[5])
+        recv = int(args[6])
         
         #Probability of dropping a packet
-        DROP_RATE = float(args[6])
+        DROP_RATE = float(args[7])
     except ValueError:
-        sys.exit("""Usage: python3 channel.py <sender_in_port> <sender_out_port> <recv_in_port> 
-        <recv_out_port> <sender> <recv> <drop_rate>""")
+        sys.exit("""Usage: {} <sender_in_port> <sender_out_port> <recv_in_port> <recv_out_port> <sender> <recv> <drop_rate>""".format)
         
     #Check that the drop rate is between 0 and 1 (inclusive)
     if (DROP_RATE > 1) or (DROP_RATE < 0):
@@ -124,6 +123,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    ##args = sys.argv[1:]
-    args = [15620, 15621, 15622, 15623, 15630, 15640, 1]
+    ##args = sys.argv[]
+    args = ['channel.py', 15620, 15621, 15622, 15623, 15630, 15640, 1]
     main(args)
