@@ -67,7 +67,7 @@ def main(args):
         sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_in.bind(("", sender_in_port))
         sender_in.listen(1)
-        print("Started sender_in")
+        print("Started sender_in at port", sender_in_port)
     except IOError: #If it fails give up and go home
         print("An IO Error occurred trying to create sender_in")
         sys.exit()
@@ -76,28 +76,28 @@ def main(args):
         recv_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         recv_in.bind(("", recv_in_port))
         recv_in.listen(1)
-        print("Started recv_in")
+        print("Started recv_in at port", recv_in_port)
     except IOError:
         print("An IO Error occurred trying to create recv_in")
         sys.exit()
     
     input("Please start sender and receiver then press enter")
-    #try:
-        #sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #sender_out.bind(("", sender_out_port))
-        #sender_out.connect(("", sender))
-        #print("Started sender_out")
-    #except IOError:
-        #print("An IO Error occurred trying to connect to sender")
-        #sys.exit()
+    try:
+        sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sender_out.bind(("", sender_out_port))
+        sender_out.connect(("", sender))
+        print("Started sender_out")
+    except IOError:
+        print("An IO Error occurred trying to connect to sender at port", sender)
+        sys.exit()
     
     try: 
         recv_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         recv_out.bind(("", recv_out_port))
-        recv_out.connect(("", recv))
+        #recv_out.connect(("", recv))
         print("Started recv_out")
     except IOError:
-        print("An IO Error occurred trying to connect to sender")
+        print("An IO Error occurred trying to connect to receiver")
         sys.exit()
         
     main_loop(sender_in, 12, recv_in, recv_out)
