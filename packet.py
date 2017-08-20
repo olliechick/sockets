@@ -28,30 +28,40 @@ class Packet:
         return self.__str__() 
     
     def __str__(self):
+        pt = 'unknown'
+        if self.packet_type == 0:
+            pt = 'data'
+        elif self.packet_type == 1:
+            pt = 'ack'
+            
         s =  'Magic number: {}\n'.format(self.magic_no)
-        s += 'Packet type: {}\n'.format(self.packet_type)
+        s += 'Packet type: {} ({})\n'.format(self.packet_type, pt)
         s += 'Seq no: {}\n'.format(self.seq_no)
         s += 'Data len: {}\n'.format(self.data_len)
         s += 'Data: "{}"'.format(self.data)
         return(s)
         
     """Returns the byte representation of the packet"""
-    def byte_conversion(self):
+    def encode(self):
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
         conv += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
         conv += str(self.data)
+        print("Encoded {}-{} ({}) successfully.".format(self.packet_type, self.seq_no, self.data_len))
         return bytes(conv, "utf-8")
         
     
-    """Sets the fields of this packet to that of p"""
-    def byte_deconversion(self, p):
-        p = str(p)
-        p = p[2:-1]
-        self.magic_no = int(p[:5])
-        self.packet_type = int(p[5])
-        self.seq_no = int(p[6])
-        self.data_len = int(p[7:10])
-        self.data = p[10:]
-        ##print('\n\nCreated: {}\n\n'.format(self))
+    """Sets the fields of this packet to that of data"""
+    def decode(self, data):
+        try:
+            print("Attempting to deconvert", data)
+            data = data.decode()
+            self.magic_no = int(data[:5])
+            self.packet_type = int(data[5])
+            self.seq_no = int(data[6])
+            self.data_len = int(data[7:10])
+            self.data = data[10:]
+            print('Success! Created: {}'.format(self))
+        except:
+            print("Error decoding data. Packet is unchanged.")
