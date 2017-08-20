@@ -43,7 +43,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
             
             if data_to_forward != None: #if the packet isn't dropped
                 print("Sending data back")
-                if s.getsockname() == sender_in.getsockname(): #came from sender send to reciever
+                if s.getsockname() == sender_in.getsockname(): #came from sender send to receiver
                     recv_out.sendall(data_to_forward)
                 else: #else send to sender
                     sender_out.sendall(data_to_forward)
@@ -81,7 +81,7 @@ def main(args):
         print("An IO Error occurred trying to create recv_in")
         sys.exit()
     
-    input("Please start sender and reciever then press enter")
+    input("Please start sender and receiver then press enter")
     #try:
         #sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #sender_out.bind(("", sender_out_port))
