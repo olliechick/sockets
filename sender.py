@@ -2,8 +2,8 @@
 A program to send packets to a channel.
 For a COSC264 assignment.
 
-Author: Ollie Chick
-Date modified: 20 August 2017
+Author: Ollie Chick and Samuel Pell
+Date modified: 21 August 2017
 """
 
 import sys, socket, os, packet, select
@@ -17,12 +17,12 @@ def main(args):
         channel_in_port = int(args[3])
         filename = args[4]
     except:
-        print("Usage: {} <in_port> <out_port> <channel_in_port> <filename>".format(args[0]))
+        print("Usage: python3 {} <in_port> <out_port> <channel_in_port> <filename>".format(args[0]))
         return
     else:
         for port in [in_port, out_port, channel_in_port]:
             if port < 1024 or port > 64000:
-                print("All port numbers should be in the range [1024, 64000].")
+                print("All port numbers should be integers in the range [1024, 64000].")
                 return
         
     # Create sockets
@@ -58,7 +58,7 @@ def main(args):
        
     # Initialisation 
     next_no = 0
-    exitFlag = False
+    exit_flag = False
     file = open(filename, "rb")
     input("Please acknowledge on the channel that you have started the sender, then press enter.")
     
@@ -76,7 +76,7 @@ def main(args):
         seq_no = next_no
         data_len = len(data)
         if data_len == 0:
-            exitFlag = True
+            exit_flag = True
         pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
         
         # Testing
@@ -90,6 +90,9 @@ def main(args):
         
         # Place pack into a buffer, packetBuffer
         ## ?????????
+        ##Written by a c programmer's point of view. He probably wants you to 
+        ##create a new location of memory you can hand over to the socket without
+        ##side effects -S
         
         # Inner loop
         return_to_outer_loop = False
@@ -115,7 +118,7 @@ def main(args):
                 if rcvd.magic_no == 0x497E and rcvd.packet_type == packet.PTYPE_ACK \
                    and rcvd.data_len == 0 and rcvd.seq_no == next_no:
                     next_no = 1 - next_no
-                    if exitFlag:
+                    if exit_flag:
                         file.close()
                         socket_in.close()
                         socket_out.close()

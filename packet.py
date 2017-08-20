@@ -3,14 +3,14 @@
    A class to represent a packet of information.
    
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 20 August 2017
+   Date Modified: 21 August 2017
    
    Contains:
        __init__()
        __repr__()
        __str__()
-       byte_conversion()
-       byte_deconversion()
+       encode()
+       decode()
 """
 PTYPE_DATA = 0
 PTYPE_ACK = 1
@@ -41,19 +41,23 @@ class Packet:
         s += 'Data: "{}"'.format(self.data)
         return(s)
         
-    """Returns the byte representation of the packet"""
+    
     def encode(self):
+        """Returns the byte representation of the packet"""
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
         conv += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
         conv += str(self.data)
-        print("Encoded {}-{} ({}) successfully.".format(self.packet_type, self.seq_no, self.data_len))
+        print("Encoded {}-{} ({}) successfully.".format(self.packet_type, 
+                                                        self.seq_no, 
+                                                        self.data_len))
         return bytes(conv, "utf-8")
         
     
-    """Sets the fields of this packet to that of data"""
+    
     def decode(self, data):
+        """Sets the fields of this packet to that of data"""
         try:
             print("Attempting to deconvert", data)
             data = data.decode()

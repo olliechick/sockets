@@ -2,7 +2,7 @@ import socket
 from packet import Packet
 
 HOST = ''
-SENDER_PORT = 15633
+SENDER_PORT = 15635
 OUT_PORT = 15620
 RECIEVER_PORT = 15640
 
@@ -22,7 +22,7 @@ print("Started sender")
 input("Send data?")
 s.connect((HOST, OUT_PORT))
 p = Packet(0x497E, 0, 0, 20, "*"*20)
-s.sendall(p.byte_conversion())
+s.sendall(p.encode())
 print("Data sent")
 
 
@@ -31,7 +31,7 @@ conn, addr = s2.accept()
 data = conn.recv(1024)
 
 n = Packet(0,0,0,0,0)
-n.byte_deconversion(data)
+n.decode(data)
 print("Received " + n.data)
 
 s.close()

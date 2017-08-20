@@ -3,7 +3,7 @@
    A program for the COSC264-17S2 Assignment
    
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 20 August 2017
+   Date Modified: 21 August 2017
 """
 
 import socket
@@ -18,8 +18,9 @@ DROP_RATE = 0
 
 
 def process_packet(data):
-    """Process an input packet (as bytes) and randomly drop it or change its header.
-    Returns the input packet as bytes.
+    """
+       Process an input packet (as bytes) and randomly drop it or change its 
+       header. Returns the input packet as bytes.
     """
     if True: #so Wing doesn't complain
         return data #just for testing
@@ -43,7 +44,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        respectively. Takes the four socket objects as arguments.
     """
     while True:
-        print("Waiting...", flush = True)
+        print("Waiting...", flush=True)
         
         readable, _, _ = select.select([sender_in, recv_in], [], [])
         
@@ -92,12 +93,12 @@ def main(args):
     for port in [sender_in_port, sender_out_port, recv_in_port, \
                  recv_out_port, sender, recv]:
         if port < 1024 or port > 64000:
-            print("All port numbers should be in the range [1024, 64000].")
+            print("All port numbers should be integers in the range [1024, 64000].")
             return
         
         
-    #Check that the drop rate is between 0 and 1 (inclusive)
-    if (DROP_RATE > 1) or (DROP_RATE < 0):
+    #Check that the drop rate is between 0 and 1
+    if (DROP_RATE > 1) or (DROP_RATE < 0): ##CHANGE ME WHEN TESTING FINISHED
         print("drop_rate should be in the range [0, 1).") 
         return
     
@@ -108,7 +109,7 @@ def main(args):
         sender_in.listen(1)
         print("Started sender_in at port {}".format(sender_in_port))
     except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to create sender_in")
+        sys.exit("An IO Error occurred trying to create sender_in.")
         
     try:
         #Create the socket to be connected to by recievers's out port
@@ -117,18 +118,18 @@ def main(args):
         recv_in.listen(1)
         print("Started recv_in at port {}".format(recv_in_port))
     except IOError:
-        sys.exit("An IO Error occurred trying to create recv_in")
+        sys.exit("An IO Error occurred trying to create recv_in.")
     
-    input("Please start sender and receiver then press enter")
+    input("Please start sender and receiver then press enter.")
     
     try:
         #Create the socket to connect to sender's in port
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_out.bind(("", sender_out_port))
-        sender_out.connect(("", sender))
+        #sender_out.connect(("", sender))
         print("Started sender_out ")
     except IOError:
-        sys.exit("An IO Error occurred trying to connect to sender at port {}".format(sender))
+        sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
     
     try:
         #Create the socket to connect to recievers in port
@@ -137,7 +138,7 @@ def main(args):
         recv_out.connect(("", recv))
         print("Started recv_out")
     except IOError:
-        sys.exit("An IO Error occurred trying to connect to receiver at port {}".format(recv))
+        sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
 
     main_loop(sender_in, sender_out, recv_in, recv_out)
 
