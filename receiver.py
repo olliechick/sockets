@@ -32,7 +32,7 @@ def main(args):
     try:
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_in.bind((IP, in_port))
-        socket_in.listen(1)
+        socket_in.listen(2)
         print("Started socket_in at port", in_port)
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create socket_in.")
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     # * a file name, indicating where the received data should be stored
     args = sys.argv
     
-    args = ['sender.py', 15640, 15641, 15622, 'rec.txt'] ##this is just for testing
+    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()    
+    args = ['sender.py', r_in, r_out, c_r_in, 'rec.txt'] ##this is just for testing
     
     main(args)

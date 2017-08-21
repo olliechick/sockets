@@ -32,6 +32,7 @@ def server(port):
     sock.bind((IP, port))  # Claim the port for the server to use
 
     while True:
+        print("Waiting...")
         data, sender = sock.recvfrom(1024)  # Get some data, blocking
         if data == b'request-time':  # b is for bytes, strings are too fancy
             now = datetime.datetime.now().strftime("%I:%M:%S%p on %B %d, %Y")

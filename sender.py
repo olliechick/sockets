@@ -32,7 +32,7 @@ def main(args):
     try:
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_in.bind((IP, in_port))
-        socket_in.listen(1)
+        socket_in.listen(2)
         print("Started socket_in at port", in_port)
     except IOError: #If it fails give up and go home
         socket_in.close()
@@ -151,7 +151,8 @@ if __name__ == "__main__":
     # Uncomment as appropriate
     #filename = 'small.txt'
     filename = 'data.txt'
-    
-    args = ['sender.py', 15630, 15631, 15620, filename] ##this is just for testing
+
+    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()        
+    args = ['sender.py', s_in, s_out, c_s_in, filename] ##this is just for testing
     
     main(args)

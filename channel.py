@@ -45,11 +45,16 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
     """
     while True:
         print("Waiting...", flush=True)
-        
-        readable, _, _ = select.select([sender_in, recv_in], [], [])
-        
+        print(sender_in)
+        readable, aa, bb = select.select([sender_in, recv_in], [], [])
+        print("Got something hopefully")
+        for a in aa:
+            print('\n\n\n\na:', a)
+        for b in bb:
+            print('\n\n\n\nb:', b)
         for s in readable:
             conn, addr = s.accept()
+            print(conn)
             data = conn.recv(1024)
             print("Got some data:", data)
             
@@ -64,6 +69,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
                     print("Forwarding data to sender.")
                     sender_out.sendall(data_to_forward)
                     print("Sent.")
+            conn.close()
 
 
 def main(args):
@@ -106,7 +112,7 @@ def main(args):
         #Create the socket to be connected to by sender's out port
         sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_in.bind(("", sender_in_port))
-        sender_in.listen(10)
+        sender_in.listen(1)
         print("Started sender_in at port {}".format(sender_in_port))
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create sender_in.")
@@ -115,7 +121,7 @@ def main(args):
         #Create the socket to be connected to by recievers's out port
         recv_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         recv_in.bind(("", recv_in_port))
-        recv_in.listen(10)
+        recv_in.listen(1)
         print("Started recv_in at port {}".format(recv_in_port))
     except IOError:
         sys.exit("An IO Error occurred trying to create recv_in.")
@@ -126,7 +132,7 @@ def main(args):
         #Create the socket to connect to sender's in port
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_out.bind(("", sender_out_port))
-        sender_out.connect(("", sender))
+        #sender_out.connect(("", sender)) ## UNCOMMENT THIS FOR REALSIES
         print("Started sender_out ")
     except IOError:
         sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
