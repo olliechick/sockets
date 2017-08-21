@@ -37,6 +37,7 @@ n.decode(data)
 print("Received " + n.data)
 
 
+print(s)
 
 input()
 

@@ -17,7 +17,7 @@ PTYPE_ACK = 1
 
 def get_socket_numbers():
     #must be in the range [1024, 64000]
-    seed = 18
+    seed = 25
     seed *= 10
     
     sender_base  = 5000

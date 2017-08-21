@@ -12,7 +12,6 @@ import sys
 import packet
 import random
 
-
 BIT_ERR_RATE = 0.1
 DROP_RATE = 0
 
@@ -46,12 +45,9 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
     while True:
         print("Waiting...", flush=True)
         print(sender_in)
-        readable, aa, bb = select.select([sender_in, recv_in], [], [])
+        readable, _, _ = select.select([sender_in, recv_in], [], [])
         print("Got something hopefully")
-        for a in aa:
-            print('\n\n\n\na:', a)
-        for b in bb:
-            print('\n\n\n\nb:', b)
+        
         for s in readable:
             conn, addr = s.accept()
             print(conn)
@@ -63,11 +59,11 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
             if data_to_forward != None: #if the packet isn't dropped
                 if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
                     print("Forwarding data to receiver.")
-                    recv_out.sendall(data_to_forward)
+                    recv_out.send(data_to_forward)
                     print("Sent.")
                 else: #else send to sender
                     print("Forwarding data to sender.")
-                    sender_out.sendall(data_to_forward)
+                    sender_out.send(data_to_forward)
                     print("Sent.")
             conn.close()
 
