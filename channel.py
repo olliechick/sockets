@@ -106,7 +106,7 @@ def main(args):
         #Create the socket to be connected to by sender's out port
         sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_in.bind(("", sender_in_port))
-        sender_in.listen(1)
+        sender_in.listen(10)
         print("Started sender_in at port {}".format(sender_in_port))
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create sender_in.")
@@ -115,7 +115,7 @@ def main(args):
         #Create the socket to be connected to by recievers's out port
         recv_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         recv_in.bind(("", recv_in_port))
-        recv_in.listen(1)
+        recv_in.listen(10)
         print("Started recv_in at port {}".format(recv_in_port))
     except IOError:
         sys.exit("An IO Error occurred trying to create recv_in.")
@@ -126,7 +126,7 @@ def main(args):
         #Create the socket to connect to sender's in port
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_out.bind(("", sender_out_port))
-        #sender_out.connect(("", sender))
+        sender_out.connect(("", sender))
         print("Started sender_out ")
     except IOError:
         sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
@@ -145,5 +145,6 @@ def main(args):
 
 if __name__ == "__main__":
     args = sys.argv
-    args = ['channel.py', 15620, 15621, 15622, 15623, 15630, 15640, 1]
+    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
+    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 1]
     main(args)
