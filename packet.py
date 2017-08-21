@@ -15,10 +15,22 @@
 PTYPE_DATA = 0
 PTYPE_ACK = 1
 
+def replant_seed():
+    file = open('seed', 'r')
+    seed = int(file.read())
+    file.close()
+    seed += 1
+    file = open('seed', 'w')
+    file.write(str(seed))
+    file.close()
+    
+
 def get_socket_numbers():
     #must be in the range [1024, 64000]
-    seed = 25
-    seed *= 10
+    file = open('seed', 'r')
+    seed = int(file.read())
+    file.close()
+    seed = (seed%100)*10
     
     sender_base  = 5000
     channel_base = 2000
