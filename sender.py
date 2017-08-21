@@ -35,6 +35,7 @@ def main(args):
         socket_in.listen(1)
         print("Started socket_in at port", in_port)
     except IOError: #If it fails give up and go home
+        socket_in.close()
         sys.exit("An IO Error occurred trying to create socket_in.")
     
     try:
@@ -42,6 +43,8 @@ def main(args):
         socket_out.bind((IP, out_port))
         print("Started socket_out at port", out_port)
     except IOError: #If it fails give up and go home
+        socket_in.close()
+        socket_out.close()
         sys.exit("An IO Error occurred trying to create socket_out.")
         
     # Connect out port to channel sender in port
@@ -49,6 +52,8 @@ def main(args):
         socket_out.connect((IP, channel_in_port))
         print("Connected socket_out to port", channel_in_port)
     except IOError: #If it fails give up and go home
+        socket_in.close()
+        socket_out.close()
         sys.exit("An IO Error occurred trying to connect socket_out.")
         
     # Check if file exists
