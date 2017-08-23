@@ -3,11 +3,10 @@ A program to send packets to a channel.
 For a COSC264 assignment.
 
 Author: Ollie Chick and Samuel Pell
-Date modified: 21 August 2017
+Date modified: 24 August 2017
 """
 
 import sys, socket, os, packet, select
-import time # just for hacky pause
 
 def main(args):
     
@@ -104,23 +103,7 @@ def main(args):
         while True and not return_to_outer_loop:
             # Send packet
             print('Socket socket_out =', socket_out)
-            try:
-                socket_out.send(bytes_to_send)
-            except:
-                socket_out.close()
-                socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket_out.bind((IP, out_port))
-                print("reStarted socket_out at port", out_port)
-                connected = False
-                while not connected:
-                    try:
-                        socket_out.connect((IP, channel_in_port))
-                    except:
-                        print("Error connecting. Will try again in 5s")
-                        time.sleep(5)
-                    else:
-                        connected = True
-                print("reConnected socket_out to port", channel_in_port)
+            socket_out.send(bytes_to_send))
             packets_sent += 1
             print("Sent to socket ", socket_out)
             

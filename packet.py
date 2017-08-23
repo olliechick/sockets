@@ -3,7 +3,7 @@
    A class to represent a packet of information.
    
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 21 August 2017
+   Date Modified: 24 August 2017
    
    Contains:
        __init__()

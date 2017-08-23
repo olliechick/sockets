@@ -42,6 +42,30 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        process the packet and send it on to either recv_out or sender_out
        respectively. Takes the four socket objects as arguments.
     """
+    while True:
+        print("Waiting...", flush=True)
+        print(sender_in)
+        readable, _, _ = select.select([sender_in, recv_in], [], [])
+        print("Got something hopefully")
+        
+        for s in readable:
+            conn, addr = s.accept()
+            print(conn)
+            data = conn.recv(1024)
+            print("Got some data:", data)
+            
+            data_to_forward = process_packet(data)
+            ##NOT SURE IF THIS PART WORKS
+            if data_to_forward != None: #if the packet isn't dropped
+                if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
+                    print("Forwarding data to receiver.")
+                    recv_out.send(data_to_forward)
+                    print("Sent.")
+                else: #else send to sender
+                    print("Forwarding data to sender.")
+                    sender_out.send(data_to_forward)
+                    print("Sent.")
+            #conn.close()
 
 
 def main(args):
@@ -120,51 +144,7 @@ def main(args):
     except IOError:
         sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
     
-    # Main loop
-    
-    while True:
-        print("Waiting...", flush=True)
-        print('Socket sender_in =', sender_in)
-        readable, _, _ = select.select([sender_in, recv_in], [], [])
-        print("Got something hopefully")
-        
-        for s in readable:
-            conn, addr = s.accept()
-            print('Connection conn =', conn)
-            data = conn.recv(1024)
-            print("Got some data:", data)
-            
-            data_to_forward = process_packet(data)
-            
-            ##NOT SURE IF THIS PART WORKS
-            if data_to_forward != None: #if the packet isn't dropped
-                if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
-                    print("Forwarding data to receiver.")
-                    recv_out.send(data_to_forward)
-                    print("Sent.")            
-                    
-                else: #else send to sender
-                    print("Forwarding data to sender.")
-                    sender_out.send(data_to_forward)
-                    print("Sent.")
-                    
-                    #now reset socket c_s_in - sender_in
-                    sender_in.close()
-                    sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    bound = False
-                    while not bound:
-                        try:
-                            print('attempting to bind')
-                            sender_in.bind((IP, sender_in_port))
-                            sender_in.listen(100)
-                        except:
-                            time.sleep(5) #wait 5 seconds
-                        else:
-                            print('bound')
-                            bound = True
-                    print("reStarted sender_in at port {}".format(sender_in_port))        
-                    
-            #conn.close()
+    main_loop(sender_in, sender_out, recv_in, recv_out)
 
 
 if __name__ == "__main__":
