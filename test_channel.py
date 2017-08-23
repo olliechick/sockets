@@ -14,7 +14,7 @@ input("Start Sockets?")
 
 print("Starting reciever")
 s2.bind(('', RECIEVER_PORT))
-s2.listen(1)
+s2.listen(5)
 print("Started reciever")
 print("Starting sender")
 s.bind((HOST, SENDER_PORT))

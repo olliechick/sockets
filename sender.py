@@ -104,12 +104,13 @@ def main(args):
         bytes_to_send = pack.encode()
         while True and not return_to_outer_loop:
             # Send packet
+            print(socket_out)
             socket_out.send(bytes_to_send)
             packets_sent += 1
-            print("Sent.")
+            print("Sent to socket ", socket_out)
             
             # Await a response
-            timeout = 1 #seconds
+            timeout = 3 #seconds
             readable, _, _ = select.select([socket_in], [], [], timeout)
             if readable:
                 #got a response
@@ -124,9 +125,9 @@ def main(args):
                    and rcvd.data_len == 0 and rcvd.seq_no == next_no:
                     next_no = 1 - next_no
                     if exit_flag:
-                        file.close()
-                        socket_in.close()
-                        socket_out.close()
+                        #file.close()
+                        #socket_in.close()
+                        #socket_out.close()
                         print(packets_sent, "packets sent.")
                         return
                     else:
@@ -134,7 +135,8 @@ def main(args):
             else:
                 print("No response.")
                 
-                    
+
+    print("WARNING! CLOSING SOCKETS!")                    
     file.close()
     socket_in.close()
     socket_out.close()

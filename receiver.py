@@ -87,6 +87,7 @@ def main(args):
                     file.write(rcvd.data)
                 else:
                     #data_len = 0
+                    print("WARNING! CLOSING SOCKETS!")
                     file.close()
                     socket_in.close()
                     socket_out.close()
@@ -94,7 +95,8 @@ def main(args):
                     
             
         # else do NOTHING! just go back to the start of the loop
-        
+
+    print("WARNING! CLOSING SOCKETS!")        
     file.close()
     socket_in.close()
     socket_out.close()
