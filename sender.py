@@ -7,6 +7,7 @@ Date modified: 21 August 2017
 """
 
 import sys, socket, os, packet, select
+import time # just for hacky pause
 
 def main(args):
     
@@ -26,7 +27,7 @@ def main(args):
                 return
         
     # Create sockets
-    IP = ''
+    IP = '127.0.0.1'
     packets_sent = 0
     
     try:
@@ -83,6 +84,7 @@ def main(args):
         if data_len == 0:
             exit_flag = True
         pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
+        print(len(pack))
         
         # Testing
         ##print(pack)
@@ -95,17 +97,30 @@ def main(args):
         
         # Place pack into a buffer, packetBuffer
         ## ?????????
-        ##Written by a c programmer's point of view. He probably wants you to 
-        ##create a new location of memory you can hand over to the socket without
-        ##side effects -S
         
         # Inner loop
         return_to_outer_loop = False
         bytes_to_send = pack.encode()
         while True and not return_to_outer_loop:
             # Send packet
-            print(socket_out)
-            socket_out.send(bytes_to_send)
+            print('Socket socket_out =', socket_out)
+            try:
+                socket_out.send(bytes_to_send)
+            except:
+                socket_out.close()
+                socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                socket_out.bind((IP, out_port))
+                print("reStarted socket_out at port", out_port)
+                connected = False
+                while not connected:
+                    try:
+                        socket_out.connect((IP, channel_in_port))
+                    except:
+                        print("Error connecting. Will try again in 5s")
+                        time.sleep(5)
+                    else:
+                        connected = True
+                print("reConnected socket_out to port", channel_in_port)
             packets_sent += 1
             print("Sent to socket ", socket_out)
             
@@ -120,14 +135,14 @@ def main(args):
                 data = conn.recv(1024)
                 rcvd = packet.Packet()
                 rcvd.decode(data)
-                print('Received the packet:', rcvd) #just for testing
                 if rcvd.magic_no == 0x497E and rcvd.packet_type == packet.PTYPE_ACK \
                    and rcvd.data_len == 0 and rcvd.seq_no == next_no:
                     next_no = 1 - next_no
                     if exit_flag:
-                        #file.close()
-                        #socket_in.close()
-                        #socket_out.close()
+                        print("WARNING! CLOSING SOCKETS!")  
+                        file.close()
+                        socket_in.close()
+                        socket_out.close()
                         print(packets_sent, "packets sent.")
                         return
                     else:
@@ -150,8 +165,12 @@ if __name__ == "__main__":
     # * a file name, indicating the file to send
     args = sys.argv
     
-    # Uncomment as appropriate
-    #filename = 'small.txt'
+    # Available files:
+    # Name          Size (characters)
+    #
+    # data.txt      1473
+    # small.txt     6
+    
     filename = 'data.txt'
 
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()        

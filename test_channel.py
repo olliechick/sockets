@@ -39,9 +39,9 @@ print("Received " + n.data)
 
 print(s)
 
-input()
+input("Press enter to send a second packet.")
 
-p = Packet(0x497E, 0, 1, 20, "k"*20)
+p = Packet(0x497E, 0, 1, 20, "2"*20)
 s.sendall(p.encode())
 print("Data sent")
 

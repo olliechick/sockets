@@ -11,6 +11,7 @@ import select
 import sys
 import packet
 import random
+import time # just for hacky pause
 
 BIT_ERR_RATE = 0.1
 DROP_RATE = 0
@@ -21,19 +22,18 @@ def process_packet(data):
        Process an input packet (as bytes) and randomly drop it or change its 
        header. Returns the input packet as bytes.
     """
-    if True: #so Wing doesn't complain
-        return data #just for testing
-    p = packet.Packet()
-    p.decode(data)
-    print(p.data)
-    if p.magic_no != 0x497E: #drop if magic number different
-        return None
-    elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
-        return None
-    elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
-        p.data_len += int(random.uniform(1, 10))
+    return data #just for testing - packet errors will be introduced later
+    ##p = packet.Packet()
+    ##p.decode(data)
+    ##print(p.data)
+    ##if p.magic_no != 0x497E: #drop if magic number different
+        ##return None
+    ##elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
+        ##return None
+    ##elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
+        ##p.data_len += int(random.uniform(1, 10))
     
-    return p.encode() #return the packet's byte conversion
+    ##return p.encode() #return the packet's byte conversion
 
 
 def main_loop(sender_in, sender_out, recv_in, recv_out):
@@ -42,30 +42,6 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        process the packet and send it on to either recv_out or sender_out
        respectively. Takes the four socket objects as arguments.
     """
-    while True:
-        print("Waiting...", flush=True)
-        print(sender_in)
-        readable, _, _ = select.select([sender_in, recv_in], [], [])
-        print("Got something hopefully")
-        
-        for s in readable:
-            conn, addr = s.accept()
-            print(conn)
-            data = conn.recv(1024)
-            print("Got some data:", data)
-            
-            data_to_forward = process_packet(data)
-            ##NOT SURE IF THIS PART WORKS
-            if data_to_forward != None: #if the packet isn't dropped
-                if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
-                    print("Forwarding data to receiver.")
-                    recv_out.send(data_to_forward)
-                    print("Sent.")
-                else: #else send to sender
-                    print("Forwarding data to sender.")
-                    sender_out.send(data_to_forward)
-                    print("Sent.")
-            #conn.close()
 
 
 def main(args):
@@ -74,6 +50,8 @@ def main(args):
        are valid input, then create the appropriate sockets before entering
        into the main loop
     """
+    IP = '127.0.0.1'
+    
     try:
         #Port numbers for this program
         sender_in_port = int(args[1])
@@ -107,7 +85,7 @@ def main(args):
     try:
         #Create the socket to be connected to by sender's out port
         sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sender_in.bind(("", sender_in_port))
+        sender_in.bind((IP, sender_in_port))
         sender_in.listen(100)
         print("Started sender_in at port {}".format(sender_in_port))
     except IOError: #If it fails give up and go home
@@ -116,7 +94,7 @@ def main(args):
     try:
         #Create the socket to be connected to by recievers's out port
         recv_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_in.bind(("", recv_in_port))
+        recv_in.bind((IP, recv_in_port))
         recv_in.listen(100)
         print("Started recv_in at port {}".format(recv_in_port))
     except IOError:
@@ -127,8 +105,8 @@ def main(args):
     try:
         #Create the socket to connect to sender's in port
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sender_out.bind(("", sender_out_port))
-        sender_out.connect(("", sender)) ## UNCOMMENT THIS FOR REALSIES
+        sender_out.bind((IP, sender_out_port))
+        sender_out.connect((IP, sender)) ## UNCOMMENT THIS FOR REALSIES
         print("Started sender_out ")
     except IOError:
         sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
@@ -136,13 +114,57 @@ def main(args):
     try:
         #Create the socket to connect to recievers in port
         recv_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_out.bind(("", recv_out_port))
-        recv_out.connect(("", recv))
+        recv_out.bind((IP, recv_out_port))
+        recv_out.connect((IP, recv))
         print("Started recv_out")
     except IOError:
         sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
-
-    main_loop(sender_in, sender_out, recv_in, recv_out)
+    
+    # Main loop
+    
+    while True:
+        print("Waiting...", flush=True)
+        print('Socket sender_in =', sender_in)
+        readable, _, _ = select.select([sender_in, recv_in], [], [])
+        print("Got something hopefully")
+        
+        for s in readable:
+            conn, addr = s.accept()
+            print('Connection conn =', conn)
+            data = conn.recv(1024)
+            print("Got some data:", data)
+            
+            data_to_forward = process_packet(data)
+            
+            ##NOT SURE IF THIS PART WORKS
+            if data_to_forward != None: #if the packet isn't dropped
+                if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
+                    print("Forwarding data to receiver.")
+                    recv_out.send(data_to_forward)
+                    print("Sent.")            
+                    
+                else: #else send to sender
+                    print("Forwarding data to sender.")
+                    sender_out.send(data_to_forward)
+                    print("Sent.")
+                    
+                    #now reset socket c_s_in - sender_in
+                    sender_in.close()
+                    sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    bound = False
+                    while not bound:
+                        try:
+                            print('attempting to bind')
+                            sender_in.bind((IP, sender_in_port))
+                            sender_in.listen(100)
+                        except:
+                            time.sleep(5) #wait 5 seconds
+                        else:
+                            print('bound')
+                            bound = True
+                    print("reStarted sender_in at port {}".format(sender_in_port))        
+                    
+            #conn.close()
 
 
 if __name__ == "__main__":

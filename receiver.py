@@ -27,7 +27,7 @@ def main(args):
                 return        
             
     # Create sockets
-    IP = ''
+    IP = '127.0.0.1'
     
     try:
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

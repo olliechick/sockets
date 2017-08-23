@@ -73,9 +73,12 @@ class Packet:
         s += 'Data len: {}\n'.format(self.data_len)
         s += 'Data: "{}"'.format(self.data)
         return(s)
+    
+    def __len__(self):
+        return len(self.encode(printStuff = False))
         
     
-    def encode(self):
+    def encode(self, printStuff = True):
         """Returns the byte representation of the packet"""
         conv = str(self.magic_no)
         conv += str(self.packet_type)
