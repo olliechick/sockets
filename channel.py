@@ -49,9 +49,8 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
         print("Got something hopefully")
         
         for s in readable:
-            conn, addr = s.accept()
-            print(conn, '= conn')
-            data = conn.recv(1024)
+            print(s, '=s')
+            data = s.recv(1024)
             print("Got some data:", data)
             
             data_to_forward = process_packet(data)
@@ -61,7 +60,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
                     print("Forwarding data to receiver.")
                     recv_out.send(data_to_forward)
                     print("Sent.")
-                else: #else send to sender
+                else: #else came from receiver, send to sender
                     print("Forwarding data to sender.")
                     sender_out.send(data_to_forward)
                     print("Sent.")
@@ -143,6 +142,10 @@ def main(args):
         print("Started recv_out")
     except IOError:
         sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
+        
+        
+    sender_in, addr = sender_in.accept()
+    recv_in, addr = recv_in.accept()
     
     main_loop(sender_in, sender_out, recv_in, recv_out)
 
