@@ -44,13 +44,13 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
     """
     while True:
         print("Waiting...", flush=True)
-        print(sender_in)
+        print(sender_in, '= sender_in')
         readable, _, _ = select.select([sender_in, recv_in], [], [])
         print("Got something hopefully")
         
         for s in readable:
             conn, addr = s.accept()
-            print(conn)
+            print(conn, '= conn')
             data = conn.recv(1024)
             print("Got some data:", data)
             

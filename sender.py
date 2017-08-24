@@ -83,7 +83,7 @@ def main(args):
         if data_len == 0:
             exit_flag = True
         pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
-        print(len(pack))
+        print('Packet of length', len(pack))
         
         # Testing
         ##print(pack)
@@ -102,7 +102,7 @@ def main(args):
         bytes_to_send = pack.encode()
         while True and not return_to_outer_loop:
             # Send packet
-            print('Socket socket_out =', socket_out)
+            print(socket_out, '= socket_out')
             socket_out.send(bytes_to_send)
             packets_sent += 1
             print("Sent to socket ", socket_out)
