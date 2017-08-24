@@ -103,7 +103,7 @@ def main(args):
         while True and not return_to_outer_loop:
             # Send packet
             print('Socket socket_out =', socket_out)
-            socket_out.send(bytes_to_send))
+            socket_out.send(bytes_to_send)
             packets_sent += 1
             print("Sent to socket ", socket_out)
             
