@@ -1,7 +1,7 @@
 """
    channel
    A program for the COSC264-17S2 Assignment
-   
+
    Authors: Samuel Pell and Ollie Chick
    Date Modified: 21 August 2017
 """
@@ -15,25 +15,57 @@ import random
 BIT_ERR_RATE = 0.1
 DROP_RATE = 0
 IP = '127.0.0.1'
+MAGIC_NO = 0x497E
+
+
+def create_sending_socket(local_port, remote_port):
+    """
+       Creates a socket on the local_port and connects it to the
+       remote_port socket. Exits the program if it fails.
+    """
+    try:
+        #Create the socket to connect to sender's in port
+        new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        new_socket.bind((IP, local_port))
+        new_socket.connect((IP, remote_port))
+        print("Started sending socket at port {} connected to {}"
+              .format(local_port, remote_port))
+    except IOError: #If it fails give up and go home
+        sys.exit("An IO Error occurred trying to create and connect port on {} to {}."
+                 .format(local_port, remote_port))
+
+    return new_socket
+
+
+def create_listening_socket(port):
+    """Creates a socket to listen on the port given. Exits the program if it fails."""
+    try:
+        new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        new_socket.bind((IP, port))
+        new_socket.listen(1)
+        print("Started listening socket at port {}".format(port))
+    except IOError: #If it fails give up and go home
+        sys.exit("An IO Error occurred trying to create socket on {}.".format(port))
+
+    return new_socket
 
 
 def process_packet(data):
     """
-       Process an input packet (as bytes) and randomly drop it or change its 
+       Process an input packet (as bytes) and randomly drop it or change its
        header. Returns the input packet as bytes.
     """
-    return data #just for testing - packet errors will be introduced later
-    ##p = packet.Packet()
-    ##p.decode(data)
-    ##print(p.data)
-    ##if p.magic_no != 0x497E: #drop if magic number different
-        ##return None
-    ##elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
-        ##return None
-    ##elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
-        ##p.data_len += int(random.uniform(1, 10))
-    
-    ##return p.encode() #return the packet's byte conversion
+    p = packet.Packet()
+    p.decode(data)
+
+    if p.magic_no != MAGIC_NO: #drop if magic number different
+        return None
+    elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
+        return None
+    elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
+        p.data_len += int(random.uniform(1, 10))
+
+    return p.encode() #return the packet's byte conversion
 
 
 def main_loop(sender_in, sender_out, recv_in, recv_out):
@@ -41,20 +73,20 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        Wait to recieve packets on sender_in and recv_in. When it does,
        process the packet and send it on to either recv_out or sender_out
        respectively. Takes the four socket objects as arguments.
-       
+
        When one of the sockets indicates it has closed it will stop watching it
        and when both sockets have closed it will return None
     """
     sockets_to_watch = [sender_in, recv_in]
+
     while True:
         print("\n\n\nWaiting...", flush=True)
         readable, _, _ = select.select(sockets_to_watch, [], [])
-        print("Got something hopefully")
-        
+
         for s in readable:
             data = s.recv(1024)
-            print("Got some data:", data)
-            
+            #print("Got some data:", data)
+
             if data == b'':
                 print("\n\nOne of the sockets sender_in or recv_in has closed")
                 if s.getsockname() == recv_in.getsockname():
@@ -98,74 +130,49 @@ def main(args):
         sender_out_port = int(args[2])
         recv_in_port = int(args[3])
         recv_out_port = int(args[4])
-        
+
         #Port numbers of the sender and reciver
         sender = int(args[5])
         recv = int(args[6])
-        
+
         #Probability of dropping a packet
         DROP_RATE = float(args[7])
     except:
         print("""Usage: python3 {} <sender_in_port> <sender_out_port> <recv_in_port> <recv_out_port> <sender> <recv> <drop_rate>""".format(args[0]))
         return
-    
+
     # Check that ports are in the valid range
     for port in [sender_in_port, sender_out_port, recv_in_port, \
                  recv_out_port, sender, recv]:
         if port < 1024 or port > 64000:
             print("All port numbers should be integers in the range [1024, 64000].")
             return
-        
-        
+
     #Check that the drop rate is between 0 and 1
-    if (DROP_RATE > 1) or (DROP_RATE < 0): ##CHANGE ME WHEN TESTING FINISHED
-        print("drop_rate should be in the range [0, 1).") 
+    if (DROP_RATE >= 1) or (DROP_RATE < 0): ##CHANGE ME WHEN TESTING FINISHED
+        print("drop_rate should be in the range [0, 1).")
         return
-    
-    try:
-        #Create the socket to be connected to by sender's out port
-        sender_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sender_in.bind((IP, sender_in_port))
-        sender_in.listen(100)
-        print("Started sender_in at port {}".format(sender_in_port))
-    except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to create sender_in.")
-        
-    try:
-        #Create the socket to be connected to by recievers's out port
-        recv_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_in.bind((IP, recv_in_port))
-        recv_in.listen(100)
-        print("Started recv_in at port {}".format(recv_in_port))
-    except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to create recv_in.")
-    
+
+    #Create sockets
+    sender_in = create_listening_socket(sender_in_port)
+    recv_in = create_listening_socket(recv_in_port)
+
     input("Please start sender and receiver then press enter.")
-    
+
+    sender_out = create_sending_socket(sender_out_port, sender)
+    recv_out = create_sending_socket(recv_out_port, recv)
+
+    #Accept incomming connections to sender_in and recv_in
     try:
-        #Create the socket to connect to sender's in port
-        sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sender_out.bind((IP, sender_out_port))
-        sender_out.connect((IP, sender))
-        print("Started sender_out ")
-    except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
-    
-    try:
-        #Create the socket to connect to recievers in port
-        recv_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        recv_out.bind((IP, recv_out_port))
-        recv_out.connect((IP, recv))
-        print("Started recv_out")
-    except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
-        
-        
-    sender_in, addr = sender_in.accept()
-    recv_in, addr = recv_in.accept()
-    
+        sender_in, addr = sender_in.accept()
+        recv_in, addr = recv_in.accept()
+    except IOError:
+        sys.exit("Error connecting sender_in or recv_in")
+
+    #Enter the main loop
     main_loop(sender_in, sender_out, recv_in, recv_out)
-    
+
+    #Now that the main loop has finished close all the sockets
     sender_in.close()
     sender_out.close()
     recv_in.close()

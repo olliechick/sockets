@@ -56,7 +56,7 @@ def main(args):
     except IOError: #If it fails give up and go home
         socket_in.close()
         socket_out.close()
-        sys.exit("An IO Error occurred trying to connect socket_out.")
+        sys.exit("An IO Error occurred trying to connect socket_out. Port:{}".format(channel_in_port))
         
     # Check if file exists
     if not os.path.isfile(filename):

@@ -49,7 +49,7 @@ def main(args):
         socket_out.connect((IP, channel_in_port))
         print("Connected socket_out to port", channel_in_port)
     except IOError: #If it fails give up and go home
-        sys.exit("An IO Error occurred trying to connect socket_out.")
+        sys.exit("An IO Error occurred trying to connect socket_out. Port: {}".format(channel_in_port))
         
     # Check if file exists - commented out for testing purposes
     ##if os.path.isfile(filename):
