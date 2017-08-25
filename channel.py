@@ -42,7 +42,8 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        process the packet and send it on to either recv_out or sender_out
        respectively. Takes the four socket objects as arguments.
     """
-    while True:
+    TTL = 20
+    while TTL > 0:
         print("Waiting...", flush=True)
         print(sender_in, '= sender_in')
         readable, _, _ = select.select([sender_in, recv_in], [], [])
@@ -52,6 +53,8 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
             print(s, '=s')
             data = s.recv(1024)
             print("Got some data:", data)
+            if data == b'':
+                TTL -= 1
             
             data_to_forward = process_packet(data)
             ##NOT SURE IF THIS PART WORKS
