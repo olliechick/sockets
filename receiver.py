@@ -60,6 +60,8 @@ def main(args):
     file = open(filename, 'w')
     input("Please acknowledge on the channel that you have started the receiver, then press enter.")
     
+    socket_in, addr = socket_in.accept()    
+        
     # Main loop
     while True:
         print("\n\n\nWaiting...", flush=True)
@@ -67,8 +69,7 @@ def main(args):
         #got a response
         print('got a response')
         s = readable[0]
-        conn, addr = s.accept()
-        data = conn.recv(1024)
+        data = s.recv(1024)
         rcvd = packet.Packet()
         rcvd.decode(data)
         if rcvd.magic_no == VALID_MAGIC_NO and rcvd.packet_type == packet.PTYPE_DATA:

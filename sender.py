@@ -67,6 +67,9 @@ def main(args):
     file = open(filename, "rb")
     input("Please acknowledge on the channel that you have started the sender, then press enter.")
     
+    
+    socket_in, addr = socket_in.accept()    
+    
     # Outer loop
     while True:
         print("\n\n\n")
@@ -114,8 +117,7 @@ def main(args):
                 #got a response
                 print('got a response')
                 s = readable[0]
-                conn, addr = s.accept()
-                data = conn.recv(1024)
+                data = s.recv(1024)
                 rcvd = packet.Packet()
                 rcvd.decode(data)
                 if rcvd.magic_no == 0x497E and rcvd.packet_type == packet.PTYPE_ACK \
@@ -154,7 +156,7 @@ if __name__ == "__main__":
     # data.txt      1473
     # small.txt     6
     
-    filename = 'data.txt'
+    filename = 'pg4300.txt'
 
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()        
     args = ['sender.py', s_in, s_out, c_s_in, filename] ##this is just for testing
