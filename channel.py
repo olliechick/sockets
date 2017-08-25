@@ -3,7 +3,7 @@
    A program for the COSC264-17S2 Assignment
 
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 21 August 2017
+   Date Modified: 26 August 2017
 """
 
 import socket
@@ -80,15 +80,14 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
     sockets_to_watch = [sender_in, recv_in]
 
     while True:
-        print("\n\n\nWaiting...", flush=True)
+        print("\n\nWaiting...", flush=True)
         readable, _, _ = select.select(sockets_to_watch, [], [])
 
         for s in readable:
             data = s.recv(1024)
-            #print("Got some data:", data)
 
             if data == b'':
-                print("\n\nOne of the sockets sender_in or recv_in has closed")
+                print("\nOne of the sockets sender_in or recv_in has closed")
                 if s.getsockname() == recv_in.getsockname():
                     print("It was recv_in")
                     #if recv_in has closed stop watching it
@@ -149,7 +148,7 @@ def main(args):
             return
 
     #Check that the drop rate is between 0 and 1
-    if (DROP_RATE >= 1) or (DROP_RATE < 0): ##CHANGE ME WHEN TESTING FINISHED
+    if (DROP_RATE >= 1) or (DROP_RATE < 0):
         print("drop_rate should be in the range [0, 1).")
         return
 
@@ -183,5 +182,5 @@ if __name__ == "__main__":
     args = sys.argv
     packet.replant_seed()
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
-    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 1]
+    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0.1]
     main(args)
