@@ -13,10 +13,14 @@ import packet
 import random
 
 BIT_ERR_RATE = 0.1
-DROP_RATE = 0
 IP = '127.0.0.1'
 MAGIC_NO = 0x497E
 
+global NUM_DROPPED
+global NUM_CHANGED
+
+NUM_CHANGED = 0
+NUM_DROPPED = 0
 
 def create_sending_socket(local_port, remote_port):
     """
@@ -50,25 +54,35 @@ def create_listening_socket(port):
     return new_socket
 
 
-def process_packet(data):
+def process_packet(data, drop_rate):
     """
        Process an input packet (as bytes) and randomly drop it or change its
-       header. Returns the input packet as bytes.
+       header. Returns the input packet as bytes. Returns the null byte if the
+       input data is the null byte.
     """
+    global NUM_DROPPED
+    global NUM_CHANGED
+    if data == b'':
+        return data
+
     p = packet.Packet()
     p.decode(data)
 
     if p.magic_no != MAGIC_NO: #drop if magic number different
         return None
-    elif random.uniform(0, 1) < DROP_RATE: #drop by random chance
+    elif random.uniform(0, 1) < drop_rate: #drop by random chance
+        print("Dropping the packet")
+        NUM_DROPPED += 1
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
+        print("Changing the packet")
+        NUM_CHANGED += 1
         p.data_len += int(random.uniform(1, 10))
 
     return p.encode() #return the packet's byte conversion
 
 
-def main_loop(sender_in, sender_out, recv_in, recv_out):
+def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
     """
        Wait to recieve packets on sender_in and recv_in. When it does,
        process the packet and send it on to either recv_out or sender_out
@@ -103,9 +117,10 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
                         print("Time to go home")
                         return
             else:
-                data_to_forward = process_packet(data)
+                data_to_forward = process_packet(data, drop_rate)
                 ##NOT SURE IF THIS PART WORKS
-                if data_to_forward != None: #if the packet isn't dropped
+                if data_to_forward != None or data_to_forward == b'':
+                    #if the packet isn't dropped
                     if s.getsockname() == sender_in.getsockname():
                         #came from sender, send to receiver
                         print("Forwarding data to receiver.")
@@ -135,7 +150,7 @@ def main(args):
         recv = int(args[6])
 
         #Probability of dropping a packet
-        DROP_RATE = float(args[7])
+        drop_rate = float(args[7])
     except:
         print("""Usage: python3 {} <sender_in_port> <sender_out_port> <recv_in_port> <recv_out_port> <sender> <recv> <drop_rate>""".format(args[0]))
         return
@@ -148,7 +163,7 @@ def main(args):
             return
 
     #Check that the drop rate is between 0 and 1
-    if (DROP_RATE >= 1) or (DROP_RATE < 0):
+    if (drop_rate >= 1) or (drop_rate < 0):
         print("drop_rate should be in the range [0, 1).")
         return
 
@@ -169,7 +184,7 @@ def main(args):
         sys.exit("Error connecting sender_in or recv_in")
 
     #Enter the main loop
-    main_loop(sender_in, sender_out, recv_in, recv_out)
+    main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate)
 
     #Now that the main loop has finished close all the sockets
     sender_in.close()
@@ -182,5 +197,7 @@ if __name__ == "__main__":
     args = sys.argv
     packet.replant_seed()
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
-    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0.1]
+    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0]
     main(args)
+
+    print("Num Dropped: {}\nNum Changed: {}".format(NUM_DROPPED, NUM_CHANGED))

@@ -151,7 +151,7 @@ if __name__ == "__main__":
     # data.txt      1473
     # small.txt     6
 
-    filename = 'pg4300.txt'
+    filename = 'data.txt'
 
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
     args = ['sender.py', s_in, s_out, c_s_in, filename] ##this is just for testing
