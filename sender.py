@@ -8,6 +8,8 @@ Date modified: 24 August 2017
 
 import sys, socket, os, packet, select
 
+MAGIC_NO = 0x497E
+
 def main(args):
     
     # Check arguments are valid
@@ -79,33 +81,21 @@ def main(args):
         data = data.decode('utf8')
         
         # Prepare packet
-        magic_no = 0x497E
+        
         packet_type = packet.PTYPE_DATA
         seq_no = next_no
         data_len = len(data)
         if data_len == 0:
             exit_flag = True
-        pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
+        pack = packet.Packet(MAGIC_NO, packet_type, seq_no, data_len, data)
         print('Packet of length', len(pack))
-        
-        # Testing
-        ##print(pack)
-        ##pack_bytes = pack.encode()
-        ##print(pack_bytes)
-        ##p = packet.Packet(0,0,0,0,0)
-        ##p.decode(pack_bytes)
-        ##print(p)
-        
-        
-        # Place pack into a buffer, packetBuffer
-        ## ?????????
         
         # Inner loop
         return_to_outer_loop = False
         bytes_to_send = pack.encode()
+        
         while True and not return_to_outer_loop:
             # Send packet
-            print(socket_out, '= socket_out')
             socket_out.send(bytes_to_send)
             packets_sent += 1
             print("Sent to socket ", socket_out)
@@ -113,20 +103,26 @@ def main(args):
             # Await a response
             timeout = 3 #seconds
             readable, _, _ = select.select([socket_in], [], [], timeout)
+            
             if readable:
                 #got a response
                 print('got a response')
                 s = readable[0]
                 data = s.recv(1024)
+                
                 rcvd = packet.Packet()
                 rcvd.decode(data)
-                if rcvd.magic_no == 0x497E and rcvd.packet_type == packet.PTYPE_ACK \
+                
+                if rcvd.magic_no == MAGIC_NO and rcvd.packet_type == packet.PTYPE_ACK \
                    and rcvd.data_len == 0 and rcvd.seq_no == next_no:
                     next_no = 1 - next_no
+                    
                     if exit_flag:
                         print("WARNING! CLOSING SOCKETS!")  
                         file.close()
+                        socket_in.shutdown(socket.SHUT_RDWR)
                         socket_in.close()
+                        socket_out.shutdown(socket.SHUT_RDWR)
                         socket_out.close()
                         print(packets_sent, "packets sent.")
                         return

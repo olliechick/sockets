@@ -11,10 +11,10 @@ import select
 import sys
 import packet
 import random
-import time # just for hacky pause
 
 BIT_ERR_RATE = 0.1
 DROP_RATE = 0
+IP = '127.0.0.1'
 
 
 def process_packet(data):
@@ -41,33 +41,49 @@ def main_loop(sender_in, sender_out, recv_in, recv_out):
        Wait to recieve packets on sender_in and recv_in. When it does,
        process the packet and send it on to either recv_out or sender_out
        respectively. Takes the four socket objects as arguments.
+       
+       When one of the sockets indicates it has closed it will stop watching it
+       and when both sockets have closed it will return None
     """
-    TTL = 20
-    while TTL > 0:
-        print("Waiting...", flush=True)
-        print(sender_in, '= sender_in')
-        readable, _, _ = select.select([sender_in, recv_in], [], [])
+    sockets_to_watch = [sender_in, recv_in]
+    while True:
+        print("\n\n\nWaiting...", flush=True)
+        readable, _, _ = select.select(sockets_to_watch, [], [])
         print("Got something hopefully")
         
         for s in readable:
-            print(s, '=s')
             data = s.recv(1024)
             print("Got some data:", data)
-            if data == b'':
-                TTL -= 1
             
-            data_to_forward = process_packet(data)
-            ##NOT SURE IF THIS PART WORKS
-            if data_to_forward != None: #if the packet isn't dropped
-                if s.getsockname() == sender_in.getsockname(): #came from sender, send to receiver
-                    print("Forwarding data to receiver.")
-                    recv_out.send(data_to_forward)
-                    print("Sent.")
-                else: #else came from receiver, send to sender
-                    print("Forwarding data to sender.")
-                    sender_out.send(data_to_forward)
-                    print("Sent.")
-            #conn.close()
+            if data == b'':
+                print("\n\nOne of the sockets sender_in or recv_in has closed")
+                if s.getsockname() == recv_in.getsockname():
+                    print("It was recv_in")
+                    #if recv_in has closed stop watching it
+                    sockets_to_watch = [sender_in]
+                else:
+                    print("It was sender_in")
+                    if len(sockets_to_watch) == 2:
+                        #if sender_in has closed and recv_in hasn't keep watching
+                        #sender in
+                        sockets_to_watch = [recv_in]
+                    else:
+                        #if both sockets have closed. Time to clean up and exit
+                        print("Time to go home")
+                        return
+            else:
+                data_to_forward = process_packet(data)
+                ##NOT SURE IF THIS PART WORKS
+                if data_to_forward != None: #if the packet isn't dropped
+                    if s.getsockname() == sender_in.getsockname():
+                        #came from sender, send to receiver
+                        print("Forwarding data to receiver.")
+                        recv_out.send(data_to_forward)
+                        print("Sent.")
+                    else: #else came from receiver, send to sender
+                        print("Forwarding data to sender.")
+                        sender_out.send(data_to_forward)
+                        print("Sent.")
 
 
 def main(args):
@@ -76,8 +92,6 @@ def main(args):
        are valid input, then create the appropriate sockets before entering
        into the main loop
     """
-    IP = '127.0.0.1'
-    
     try:
         #Port numbers for this program
         sender_in_port = int(args[1])
@@ -123,7 +137,7 @@ def main(args):
         recv_in.bind((IP, recv_in_port))
         recv_in.listen(100)
         print("Started recv_in at port {}".format(recv_in_port))
-    except IOError:
+    except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create recv_in.")
     
     input("Please start sender and receiver then press enter.")
@@ -132,9 +146,9 @@ def main(args):
         #Create the socket to connect to sender's in port
         sender_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sender_out.bind((IP, sender_out_port))
-        sender_out.connect((IP, sender)) ## UNCOMMENT THIS FOR REALSIES
+        sender_out.connect((IP, sender))
         print("Started sender_out ")
-    except IOError:
+    except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to connect to sender at port {}.".format(sender))
     
     try:
@@ -143,7 +157,7 @@ def main(args):
         recv_out.bind((IP, recv_out_port))
         recv_out.connect((IP, recv))
         print("Started recv_out")
-    except IOError:
+    except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to connect to receiver at port {}.".format(recv))
         
         
@@ -151,6 +165,11 @@ def main(args):
     recv_in, addr = recv_in.accept()
     
     main_loop(sender_in, sender_out, recv_in, recv_out)
+    
+    sender_in.close()
+    sender_out.close()
+    recv_in.close()
+    recv_out.close()
 
 
 if __name__ == "__main__":

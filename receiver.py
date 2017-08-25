@@ -68,29 +68,35 @@ def main(args):
         readable, _, _ = select.select([socket_in], [], [])
         #got a response
         print('got a response')
+        
         s = readable[0]
         data = s.recv(1024)
         rcvd = packet.Packet()
         rcvd.decode(data)
+        
         if rcvd.magic_no == VALID_MAGIC_NO and rcvd.packet_type == packet.PTYPE_DATA:
             print("Valid packet")
+            
             magic_no = VALID_MAGIC_NO
             packet_type = packet.PTYPE_ACK
             seq_no = rcvd.seq_no
             data_len = 0
             data = ""
             pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
+            
             socket_out.send(pack.encode())
             print("Sent reply")
+            
             if rcvd.seq_no == expected:
                 expected = 1 - expected
                 if rcvd.data_len > 0:
                     file.write(rcvd.data)
                 else:
-                    #data_len = 0
                     print("WARNING! CLOSING SOCKETS!")
                     file.close()
+                    socket_in.shutdown(socket.SHUT_RDWR)
                     socket_in.close()
+                    socket_out.shutdown(socket.SHUT_RDWR)
                     socket_out.close()
                     return
                     
