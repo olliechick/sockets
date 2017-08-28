@@ -95,13 +95,14 @@ class Packet:
     def decode(self, data):
         """Sets the fields of this packet to that of data"""
         try:
-            print("Attempting to deconvert", data)
+            #print("Attempting to deconvert", data)
             data = data.decode()
             self.magic_no = int(data[:5])
             self.packet_type = int(data[5])
             self.seq_no = int(data[6])
             self.data_len = int(data[7:10])
             self.data = data[10:]
-            print('Success! Created: {}'.format(self))
+            #print('Success! Created: {}'.format(self))
+            print("Successfully decoded the packet")
         except:
             print("Error decoding data. Packet is unchanged.")
