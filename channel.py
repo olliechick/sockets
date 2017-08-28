@@ -3,7 +3,7 @@
    A program for the COSC264-17S2 Assignment
 
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 26 August 2017
+   Date Modified: 29 August 2017
 """
 
 import socket
@@ -12,15 +12,9 @@ import sys
 import packet
 import random
 
-BIT_ERR_RATE = 0
+BIT_ERR_RATE = 0.1
 IP = '127.0.0.1'
 MAGIC_NO = 0x497E
-
-global NUM_DROPPED
-global NUM_CHANGED
-
-NUM_CHANGED = 0
-NUM_DROPPED = 0
 
 def create_sending_socket(local_port, remote_port):
     """
@@ -60,8 +54,6 @@ def process_packet(data, drop_rate):
        header. Returns the input packet as bytes. Returns the null byte if the
        input data is the null byte.
     """
-    global NUM_DROPPED
-    global NUM_CHANGED
     if data == b'':
         return data
 
@@ -72,11 +64,9 @@ def process_packet(data, drop_rate):
         return None
     elif random.uniform(0, 1) < drop_rate: #drop by random chance
         print("Dropping the packet")
-        NUM_DROPPED += 1
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
         print("Changing the packet")
-        NUM_CHANGED += 1
         p.data_len += int(random.uniform(1, 10))
 
     return p.encode() #return the packet's byte conversion
@@ -100,7 +90,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
         for s in readable:
             data = s.recv(1024)
 
-            if data == b'':
+            if data == b'': #if the packet sends out the null byte it has closed
                 print("\nOne of the sockets sender_in or recv_in has closed")
                 if s.getsockname() == recv_in.getsockname():
                     print("It was recv_in")
@@ -110,17 +100,20 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
                     print("It was sender_in")
                     if len(sockets_to_watch) == 2:
                         #if sender_in has closed and recv_in hasn't keep watching
-                        #sender in
+                        #recv_in
                         sockets_to_watch = [recv_in]
                     else:
                         #if both sockets have closed. Time to clean up and exit
                         print("Time to go home")
                         return
-            else:
+
+            elif len(sockets_to_watch) != 1:
+                #if both programs are open forward it, if not do nothing
                 data_to_forward = process_packet(data, drop_rate)
-                ##NOT SURE IF THIS PART WORKS
-                if data_to_forward != None or data_to_forward == b'':
+
+                if data_to_forward != None:
                     #if the packet isn't dropped
+
                     if s.getsockname() == sender_in.getsockname():
                         #came from sender, send to receiver
                         print("Forwarding data to receiver.")
@@ -199,5 +192,3 @@ if __name__ == "__main__":
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
     args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0.05]
     main(args)
-
-    print("Num Dropped: {}\nNum Changed: {}".format(NUM_DROPPED, NUM_CHANGED))

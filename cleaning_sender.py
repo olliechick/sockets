@@ -3,16 +3,50 @@ A program to send packets to a channel.
 For a COSC264 assignment.
 
 Author: Ollie Chick and Samuel Pell
-Date modified: 26 August 2017
+Date modified: 29 August 2017
 """
 
 import sys, socket, os, packet, select
 
 MAGIC_NO = 0x497E
 IP = '127.0.0.1'
+TIMEOUT = 3 #seconds
+
+def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
+    """
+       Function to continuously send a packet until a valid acknowledgement
+       packet is recieved. Returns the number of packets sent from sender to
+       achieve successful transmission.
+    """
+    print(bytes_to_send)
+    packets_sent = 0
+
+    while True:
+        # Send packet
+        socket_out.send(bytes_to_send)
+        print("Packet sent...")
+        packets_sent += 1
+
+        # Await a response
+        readable, _, _ = select.select([socket_in], [], [], TIMEOUT)
+
+        if readable:
+            #got a response
+            print('Response received.')
+            s = readable[0]
+            data = s.recv(1024)
+
+            rcvd = packet.Packet()
+            rcvd.decode(data)
+
+            if rcvd.is_valid_ack(next_no):
+                next_no = 1 - next_no
+                return packets_sent, next_no
+        else:
+            print("No response, retransmitting.")
+
 
 def main(args):
-
     # Check arguments are valid
     try:
         in_port = int(args[1])
@@ -44,19 +78,13 @@ def main(args):
         socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_out.bind((IP, out_port))
         print("Started socket_out at port", out_port)
-    except IOError: #If it fails give up and go home
-        socket_in.close()
-        socket_out.close()
-        sys.exit("An IO Error occurred trying to create socket_out.")
-
-    # Connect out port to channel sender in port
-    try:
         socket_out.connect((IP, channel_in_port))
         print("Connected socket_out to port", channel_in_port)
     except IOError: #If it fails give up and go home
         socket_in.close()
         socket_out.close()
-        sys.exit("An IO Error occurred trying to connect socket_out. Port:{}".format(channel_in_port))
+        sys.exit("An IO Error occurred trying to create and connect socket_out.")
+
 
     # Check if file exists
     if not os.path.isfile(filename):
@@ -73,7 +101,7 @@ def main(args):
     socket_in, addr = socket_in.accept()
 
     # Outer loop
-    while True:
+    while not exit_flag:
         print("\n\n\n")
         # Read 512 bytes from filename
         data = file.read(512)
@@ -82,60 +110,32 @@ def main(args):
         data = data.decode('utf8')
 
         # Prepare packet
-
         packet_type = packet.PTYPE_DATA
         seq_no = next_no
         data_len = len(data)
         if data_len == 0:
             exit_flag = True
+
         pack = packet.Packet(MAGIC_NO, packet_type, seq_no, data_len, data)
         print('Packet of length', len(pack))
 
         # Inner loop
-        return_to_outer_loop = False
         bytes_to_send = pack.encode()
 
-        while True and not return_to_outer_loop:
-            # Send packet
-            socket_out.send(bytes_to_send)
-            packets_sent += 1
+        packets_used, next_no = inner_loop(socket_out, socket_in, bytes_to_send,
+                                           next_no)
 
-            # Await a response
-            timeout = 3 #seconds
-            readable, _, _ = select.select([socket_in], [], [], timeout)
-
-            if readable:
-                #got a response
-                print('got a response')
-                s = readable[0]
-                data = s.recv(1024)
-
-                rcvd = packet.Packet()
-                rcvd.decode(data)
-
-                if rcvd.magic_no == MAGIC_NO and rcvd.packet_type == packet.PTYPE_ACK \
-                   and rcvd.data_len == 0 and rcvd.seq_no == next_no:
-                    next_no = 1 - next_no
-
-                    if exit_flag:
-                        print("WARNING! CLOSING SOCKETS!")
-                        file.close()
-                        socket_in.shutdown(socket.SHUT_RDWR)
-                        socket_in.close()
-                        socket_out.shutdown(socket.SHUT_RDWR)
-                        socket_out.close()
-                        print(packets_sent, "packets sent.")
-                        return
-                    else:
-                        return_to_outer_loop = True
-            else:
-                print("No response.")
+        packets_sent += packets_used
 
 
+
+
+    #clean up and close
     print("WARNING! CLOSING SOCKETS!")
     file.close()
     socket_in.close()
     socket_out.close()
+    print("Packets sent: {}".format(packets_sent))
 
 
 if __name__ == "__main__":

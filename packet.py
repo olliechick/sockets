@@ -14,6 +14,7 @@
 """
 PTYPE_DATA = 0
 PTYPE_ACK = 1
+MAGIC_NO = 0x497E
 
 def replant_seed():
     file = open('seed', 'r')
@@ -91,6 +92,13 @@ class Packet:
         return bytes(conv, "utf-8")
 
 
+    def is_valid_ack(self, next_no):
+        valid_magic = self.magic_no == MAGIC_NO
+        valid_type = self.packet_type == PTYPE_ACK
+        valid_length = self.data_len == 0
+        valid_seq_no = self.seq_no == next_no
+
+        return valid_magic and valid_type and valid_length and valid_seq_no
 
     def decode(self, data):
         """Sets the fields of this packet to that of data"""
