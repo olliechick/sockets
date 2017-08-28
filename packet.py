@@ -3,14 +3,16 @@
    A class to represent a packet of information.
 
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 24 August 2017
+   Date Modified: 29 August 2017
 
    Contains:
        __init__()
        __repr__()
        __str__()
+       __len__()
        encode()
        decode()
+       is_valid_ack()
 """
 PTYPE_DATA = 0
 PTYPE_ACK = 1
@@ -58,8 +60,10 @@ class Packet:
         self.data_len = data_len       #number of bytes in the data
         self.data = data               #data carried by packet
 
+
     def __repr__(self):
         return self.__str__()
+
 
     def __str__(self):
         pt = 'unknown'
@@ -75,30 +79,37 @@ class Packet:
         s += 'Data: "{}"'.format(self.data)
         return(s)
 
+
     def __len__(self):
-        return len(self.encode(printStuff = False))
+        return len(self.encode(False))
 
 
-    def encode(self, printStuff = True):
+    def encode(self, printStuff=True):
         """Returns the byte representation of the packet"""
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
         conv += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
         conv += str(self.data)
-        print("Encoded {}-{} ({}) successfully.".format(self.packet_type,
-                                                        self.seq_no,
-                                                        self.data_len))
+        if printStuff:
+            print("Encoded {}-{} ({}) successfully.".format(self.packet_type,
+                                                            self.seq_no,
+                                                            self.data_len))
         return bytes(conv, "utf-8")
 
 
     def is_valid_ack(self, next_no):
+        """
+           Checks if the packet is a valid acknowledgement packet with the
+           correct sequence number, next_no.
+        """
         valid_magic = self.magic_no == MAGIC_NO
         valid_type = self.packet_type == PTYPE_ACK
         valid_length = self.data_len == 0
         valid_seq_no = self.seq_no == next_no
 
         return valid_magic and valid_type and valid_length and valid_seq_no
+
 
     def decode(self, data):
         """Sets the fields of this packet to that of data"""

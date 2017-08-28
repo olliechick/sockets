@@ -36,7 +36,10 @@ def create_sending_socket(local_port, remote_port):
 
 
 def create_listening_socket(port):
-    """Creates a socket to listen on the port given. Exits the program if it fails."""
+    """
+       Creates a socket to listen on the port given. Exits the program if it
+       fails.
+    """
     try:
         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         new_socket.bind((IP, port))
