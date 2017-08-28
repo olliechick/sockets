@@ -12,7 +12,7 @@ import sys
 import packet
 import random
 
-BIT_ERR_RATE = 0.1
+BIT_ERR_RATE = 0
 IP = '127.0.0.1'
 MAGIC_NO = 0x497E
 
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     args = sys.argv
     packet.replant_seed()
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
-    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0]
+    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0.1]
     main(args)
 
     print("Num Dropped: {}\nNum Changed: {}".format(NUM_DROPPED, NUM_CHANGED))
