@@ -18,7 +18,7 @@ PTYPE_DATA = 0
 PTYPE_ACK = 1
 MAGIC_NO = 0x497E
 
-def replant_seed():
+def replant_seed(): ##just for testing
     file = open('seed', 'r')
     seed = int(file.read())
     file.close()
@@ -28,7 +28,7 @@ def replant_seed():
     file.close()
 
 
-def get_socket_numbers():
+def get_socket_numbers(): ##just for testing
     #must be in the range [1024, 64000]
     file = open('seed', 'r')
     seed = int(file.read())
@@ -56,7 +56,7 @@ class Packet:
     def __init__(self, magic_no = 0, packet_type = 0, seq_no = 0, data_len = 0, data = ""):
         self.magic_no = magic_no       #determines if packet is dropped
         self.packet_type = packet_type #either dataPacket or acknowledgementPacket
-        self.seq_no = seq_no           #number in the sequence
+        self.seq_no = seq_no           #sequence number
         self.data_len = data_len       #number of bytes in the data
         self.data = data               #data carried by packet
 
