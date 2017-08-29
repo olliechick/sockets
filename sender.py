@@ -124,8 +124,8 @@ if __name__ == "__main__":
     # Get arguments from the command line.
     # These should be:
     # * two port numbers to use for the two sender sockets s_in and s_out
-    # * a port number to use for the channel socket c_s_in
-    # * a file name, indicating the file to send
+    # * the port number where the socket c_s_in should be found
+    # * a file name, indicating the file whose contents should be sent
     args = sys.argv
 
     filename = 'input' ##just for testing

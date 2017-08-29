@@ -166,6 +166,12 @@ def main(args):
 
 
 if __name__ == "__main__":
+    # Get arguments from the command line.
+    # These should be:
+    # * four port numbers to use for the sockets c_s_in, c_s_out, c_r_in, and c_r_out
+    # * the port number where the socket s_in should be found
+    # * the port number where the socket r_in should be found
+    # * a packet loss rate P such that 0 <= P < 1
     args = sys.argv
     packet.replant_seed() ##just for testing
     s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers() ##just for testing

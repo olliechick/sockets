@@ -88,7 +88,7 @@ if __name__ == "__main__":
     # Get arguments from the command line.
     # These should be:
     # * two port numbers to use for the two receiver sockets r_in and r_out
-    # * a port number to use for the channel socket c_r_in
+    # * the port number where the socket c_r_in should be found
     # * a file name, indicating where the received data should be stored
     args = sys.argv
 
