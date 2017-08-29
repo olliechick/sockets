@@ -8,7 +8,6 @@
 
 import sys, socket, os, select
 from packet import Packet, MAGIC_NO, PTYPE_DATA, PTYPE_ACK
-import packet ##just for testing
 from socket_generator import create_sending_socket, create_listening_socket
 
 TIMEOUT = 1 #seconds
@@ -120,10 +119,6 @@ if __name__ == "__main__":
     # * two port numbers to use for the two sender sockets s_in and s_out
     # * the port number where the socket c_s_in should be found
     # * a file name, indicating the file whose contents should be sent
+    
     args = sys.argv
-
-    filename = 'input' ##just for testing
-    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers() ##just for testing
-    args = ['sender.py', s_in, s_out, c_s_in, filename] ##just for testing
-
     main(args)

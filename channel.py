@@ -8,7 +8,6 @@
 
 import socket, select, sys, packet, random
 from packet import Packet, MAGIC_NO, PTYPE_DATA, PTYPE_ACK
-import packet ##just for testing
 from socket_generator import create_sending_socket, create_listening_socket
 
 BIT_ERR_RATE = 0.1
@@ -167,8 +166,6 @@ if __name__ == "__main__":
     # * the port number where the socket s_in should be found
     # * the port number where the socket r_in should be found
     # * a packet loss rate P such that 0 <= P < 1
+    
     args = sys.argv
-    packet.replant_seed() ##just for testing
-    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers() ##just for testing
-    args = ['channel.py', c_s_in, c_s_out, c_r_in, c_r_out, s_in, r_in, 0.05] ##just for testing
     main(args)

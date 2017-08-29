@@ -8,7 +8,6 @@
 
 import sys, socket, os, select
 from packet import Packet, MAGIC_NO, PTYPE_DATA, PTYPE_ACK
-import packet ##just for testing
 from socket_generator import create_sending_socket, create_listening_socket
 
 def main(args):
@@ -33,9 +32,9 @@ def main(args):
     if None in [socket_in, socket_out]:
         sys.exit("One of the sockets failed to be created.")
 
-    # Check if file exists ##commented out for testing purposes
-    ##if os.path.isfile(filename):
-        ##sys.exit("Error: {} already exists.".format(filename))
+    # Check if file exists
+    if os.path.isfile(filename):
+        sys.exit("Error: {} already exists.".format(filename))
 
     # Initialisation
     expected = 0
@@ -88,9 +87,6 @@ if __name__ == "__main__":
     # * two port numbers to use for the two receiver sockets r_in and r_out
     # * the port number where the socket c_r_in should be found
     # * a file name, indicating where the received data should be stored
+    
     args = sys.argv
-
-    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers() ##just for testing
-    args = ['sender.py', r_in, r_out, c_r_in, 'rec.txt'] ##this is just for testing
-
     main(args)
