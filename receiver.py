@@ -30,6 +30,8 @@ def main(args):
     # Create sockets (and connect socket_out)
     socket_in = create_listening_socket(in_port)
     socket_out = create_sending_socket(out_port, channel_in_port)
+    if None in [socket_in, socket_out]:
+        sys.exit("One of the sockets failed to be created.")
 
     # Check if file exists ##commented out for testing purposes
     ##if os.path.isfile(filename):

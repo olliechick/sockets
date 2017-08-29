@@ -128,12 +128,16 @@ def main(args):
     # Create in sockets
     sender_in = create_listening_socket(sender_in_port)
     recv_in = create_listening_socket(recv_in_port)
+    if None in [sender_in, recv_in]:
+        sys.exit("One of the in sockets failed to be created.")
 
     input("Please start sender and receiver then press enter.")
 
     # Create out sockets and connect them
     sender_out = create_sending_socket(sender_out_port, sender)
     recv_out = create_sending_socket(recv_out_port, recv)
+    if None in [sender_out, recv_out]:
+        sys.exit("One of the out sockets failed to be created.")
 
     # Accept incomming connections to sender_in and recv_in
     try:
