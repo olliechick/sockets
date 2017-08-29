@@ -61,30 +61,31 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
         for s in readable:
             data = s.recv(1024)
 
-            if data == b'': # if the packet sends out the null byte, it has closed
+            if data == b'': 
+                # a socket sent out the null byte (indicating it has closed)
                 ##print("\nOne of the sockets sender_in or recv_in has closed")
-                if s.getsockname() == recv_in.getsockname():
+                if s == recv_in:
                     ##print("It was recv_in")
                     # receiver has closed; stop watching it
-                    sockets_to_watch = [sender_in]
+                    sockets_to_watch.remove(recv_in)
                 else:
                     ##print("It was sender_in")
-                    if len(sockets_to_watch) == 2:
-                        # sender has closed; stop watching it
-                        sockets_to_watch = [recv_in]
-                    else:
-                        # sender and receiver have closed; clean up and exit
-                        ##print("Time to go home")
-                        return
+                    # sender has closed; stop watching it
+                    sockets_to_watch.remove(sender_in)
 
-            elif len(sockets_to_watch) != 1:
-                # if both programs are open forward it, if not do nothing
+                if len(sockets_to_watch) == 0:
+                    # sender and receiver have closed; exit loop
+                    ##print("Time to go home")
+                    return
+
+            elif len(sockets_to_watch) == 2:
+                # sender and receiver are both open
                 data_to_forward = process_packet(data, drop_rate)
 
                 if data_to_forward != None:
                     # the packet hasn't been dropped
 
-                    if s.getsockname() == sender_in.getsockname():
+                    if s == sender_in:
                         # came from sender, send to receiver
                         print("Forwarding data to receiver.")
                         recv_out.send(data_to_forward)
