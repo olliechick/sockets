@@ -32,11 +32,9 @@ def process_packet(data, drop_rate):
         return None
     elif random.uniform(0, 1) < drop_rate:
         # drop packet by random chance
-        ##print("Dropping the packet")
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE:
         # create a bit error by random chance
-        ##print("Changing the packet")
         # increment data_len by 1, 2, ..., 9, or 10
         p.data_len += random.randint(1, 10)
 
@@ -55,7 +53,6 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
     sockets_to_watch = [sender_in, recv_in]
 
     while True:
-        ##print("\n\nWaiting...", flush=True)
         readable, _, _ = select.select(sockets_to_watch, [], [])
 
         for s in readable:
@@ -63,19 +60,15 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
 
             if data == b'': 
                 # a socket sent out the null byte (indicating it has closed)
-                ##print("\nOne of the sockets sender_in or recv_in has closed")
                 if s == recv_in:
-                    ##print("It was recv_in")
                     # receiver has closed; stop watching it
                     sockets_to_watch.remove(recv_in)
                 else:
-                    ##print("It was sender_in")
                     # sender has closed; stop watching it
                     sockets_to_watch.remove(sender_in)
 
                 if len(sockets_to_watch) == 0:
                     # sender and receiver have closed; exit loop
-                    ##print("Time to go home")
                     return
 
             elif len(sockets_to_watch) == 2:
@@ -89,12 +82,10 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
                         # came from sender, send to receiver
                         print("Forwarding data to receiver.")
                         recv_out.send(data_to_forward)
-                        ##print("Sent.")
                     else: 
                         # came from receiver, send to sender
                         print("Forwarding data to sender.")
                         sender_out.send(data_to_forward)
-                        ##print("Sent.")
 
 
 def main(args):

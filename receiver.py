@@ -31,7 +31,7 @@ def main(args):
     socket_in = create_listening_socket(in_port)
     socket_out = create_sending_socket(out_port, channel_in_port)
 
-    # Check if file exists - commented out for testing purposes
+    # Check if file exists ##commented out for testing purposes
     ##if os.path.isfile(filename):
         ##sys.exit("Error: {} already exists.".format(filename))
 
@@ -45,10 +45,8 @@ def main(args):
 
     # Main loop
     while True:
-        ##print("\n\n\nWaiting...", flush=True)
         readable, _, _ = select.select([socket_in], [], [])
         # got a response
-        ##print('got a response')
         s = readable[0]
         data = s.recv(1024)
         rcvd = Packet()
@@ -56,7 +54,6 @@ def main(args):
 
         if rcvd.magic_no == MAGIC_NO and rcvd.packet_type == PTYPE_DATA:
             # got a valid data packet
-            ##print("Valid packet")
             
             # Prepare an acknowledgement packet and send it
             magic_no = MAGIC_NO
@@ -75,7 +72,6 @@ def main(args):
                     file.write(rcvd.data)
                 else:
                     # no data - indicates end of file
-                    ##print("WARNING! CLOSING SOCKETS!")
                     file.close()
                     socket_in.shutdown(socket.SHUT_RDWR)
                     socket_in.close()

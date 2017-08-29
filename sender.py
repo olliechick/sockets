@@ -20,7 +20,6 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
        packet is recieved. Returns the number of packets sent from sender to
        achieve successful transmission.
     """
-    ##print(bytes_to_send)
     packets_sent = 0
 
     while True:
@@ -45,8 +44,6 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
                 # got a valid acknowledgement packet
                 next_no = 1 - next_no
                 return packets_sent, next_no
-        ##else:
-            ##print("No response, retransmitting.")
 
 
 def main(args):
@@ -88,11 +85,8 @@ def main(args):
 
     # Outer loop
     while not exit_flag:
-        ##print("\n\n\n")
         # Read 512 bytes from file
         data = file.read(512)
-        ##print("Read data:", data)
-        ##print("Successfully read data.")
         data = data.decode(FILE_ENCODING)
 
         # Prepare packet
@@ -102,7 +96,6 @@ def main(args):
         if data_len == 0:
             exit_flag = True
         pack = Packet(MAGIC_NO, packet_type, seq_no, data_len, data)
-        ##print('Packet of length', len(pack))
 
         # Inner loop
         bytes_to_send = pack.encode()
@@ -111,7 +104,6 @@ def main(args):
         packets_sent += packets_used
 
     # Clean up and close
-    ##print("WARNING! CLOSING SOCKETS!")
     file.close()
     socket_in.shutdown(socket.SHUT_RDWR)
     socket_in.close()
