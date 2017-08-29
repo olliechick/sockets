@@ -113,7 +113,9 @@ def main(args):
     # Clean up and close
     ##print("WARNING! CLOSING SOCKETS!")
     file.close()
+    socket_in.shutdown(socket.SHUT_RDWR)
     socket_in.close()
+    socket_out.shutdown(socket.SHUT_RDWR)
     socket_out.close()
     print("Packets sent: {}".format(packets_sent))
 
