@@ -70,7 +70,7 @@ def process_packet(data, drop_rate):
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
         ##print("Changing the packet")
-        p.data_len += int(random.uniform(1, 11))
+        p.data_len += random.randint(1, 10)
 
     return p.encode() #return the packet's byte conversion
 
