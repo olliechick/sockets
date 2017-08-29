@@ -19,13 +19,13 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
        packet is recieved. Returns the number of packets sent from sender to
        achieve successful transmission.
     """
-    print(bytes_to_send)
+    ##print(bytes_to_send)
     packets_sent = 0
 
     while True:
         # Send packet
         socket_out.send(bytes_to_send)
-        print("Packet sent...")
+        ##print("Packet sent...")
         packets_sent += 1
 
         # Await a response
@@ -33,7 +33,7 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
 
         if readable:
             #got a response
-            print('Response received.')
+            ##print('Response received.')
             s = readable[0]
             data = s.recv(1024)
 
@@ -44,8 +44,8 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
                 #got a valid acknowledgement packet
                 next_no = 1 - next_no
                 return packets_sent, next_no
-        else:
-            print("No response, retransmitting.")
+        ##else:
+            ##print("No response, retransmitting.")
 
 
 def main(args):
@@ -71,7 +71,7 @@ def main(args):
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_in.bind((IP, in_port))
         socket_in.listen(2)
-        print("Started socket_in at port", in_port)
+        ##print("Started socket_in at port", in_port)
     except IOError: #If it fails give up and go home
         socket_in.close()
         sys.exit("An IO Error occurred trying to create socket_in.")
@@ -79,9 +79,9 @@ def main(args):
     try:
         socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_out.bind((IP, out_port))
-        print("Started socket_out at port", out_port)
+        ##print("Started socket_out at port", out_port)
         socket_out.connect((IP, channel_in_port))
-        print("Connected socket_out to port", channel_in_port)
+        ##print("Connected socket_out to port", channel_in_port)
     except IOError: #If it fails give up and go home
         socket_in.close()
         socket_out.close()
@@ -104,11 +104,11 @@ def main(args):
 
     # Outer loop
     while not exit_flag:
-        print("\n\n\n")
+        ##print("\n\n\n")
         # Read 512 bytes from file
         data = file.read(512)
         ##print("Read data:", data)
-        print("Successfully read data.")
+        ##print("Successfully read data.")
         data = data.decode(FILE_ENCODING)
 
         # Prepare packet
@@ -119,7 +119,7 @@ def main(args):
             exit_flag = True
 
         pack = packet.Packet(MAGIC_NO, packet_type, seq_no, data_len, data)
-        print('Packet of length', len(pack))
+        ##print('Packet of length', len(pack))
 
         # Inner loop
         bytes_to_send = pack.encode()
@@ -130,7 +130,7 @@ def main(args):
         packets_sent += packets_used
 
     #clean up and close
-    print("WARNING! CLOSING SOCKETS!")
+    ##print("WARNING! CLOSING SOCKETS!")
     file.close()
     socket_in.close()
     socket_out.close()

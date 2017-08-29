@@ -26,8 +26,8 @@ def create_sending_socket(local_port, remote_port):
         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         new_socket.bind((IP, local_port))
         new_socket.connect((IP, remote_port))
-        print("Started sending socket at port {} connected to {}"
-              .format(local_port, remote_port))
+        ##print("Started sending socket at port {} connected to {}"
+              ##.format(local_port, remote_port))
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create and connect port on {} to {}."
                  .format(local_port, remote_port))
@@ -44,7 +44,7 @@ def create_listening_socket(port):
         new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         new_socket.bind((IP, port))
         new_socket.listen(1)
-        print("Started listening socket at port {}".format(port))
+        ##print("Started listening socket at port {}".format(port))
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create socket on {}.".format(port))
 
@@ -66,10 +66,10 @@ def process_packet(data, drop_rate):
     if p.magic_no != MAGIC_NO: #drop if magic number different
         return None
     elif random.uniform(0, 1) < drop_rate: #drop by random chance
-        print("Dropping the packet")
+        ##print("Dropping the packet")
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE: #create a bit error
-        print("Changing the packet")
+        ##print("Changing the packet")
         p.data_len += int(random.uniform(1, 11))
 
     return p.encode() #return the packet's byte conversion
@@ -87,27 +87,27 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
     sockets_to_watch = [sender_in, recv_in]
 
     while True:
-        print("\n\nWaiting...", flush=True)
+        ##print("\n\nWaiting...", flush=True)
         readable, _, _ = select.select(sockets_to_watch, [], [])
 
         for s in readable:
             data = s.recv(1024)
 
             if data == b'': #if the packet sends out the null byte it has closed
-                print("\nOne of the sockets sender_in or recv_in has closed")
+                ##print("\nOne of the sockets sender_in or recv_in has closed")
                 if s.getsockname() == recv_in.getsockname():
-                    print("It was recv_in")
+                    ##print("It was recv_in")
                     #if recv_in has closed stop watching it
                     sockets_to_watch = [sender_in]
                 else:
-                    print("It was sender_in")
+                    ##print("It was sender_in")
                     if len(sockets_to_watch) == 2:
                         #if sender_in has closed and recv_in hasn't keep watching
                         #recv_in
                         sockets_to_watch = [recv_in]
                     else:
                         #if both sockets have closed. Time to clean up and exit
-                        print("Time to go home")
+                        ##print("Time to go home")
                         return
 
             elif len(sockets_to_watch) != 1:
@@ -119,13 +119,13 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
 
                     if s.getsockname() == sender_in.getsockname():
                         #came from sender, send to receiver
-                        print("Forwarding data to receiver.")
+                        ##print("Forwarding data to receiver.")
                         recv_out.send(data_to_forward)
-                        print("Sent.")
+                        ##print("Sent.")
                     else: #else came from receiver, send to sender
-                        print("Forwarding data to sender.")
+                        ##print("Forwarding data to sender.")
                         sender_out.send(data_to_forward)
-                        print("Sent.")
+                        ##print("Sent.")
 
 
 def main(args):

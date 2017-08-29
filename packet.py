@@ -84,17 +84,17 @@ class Packet:
         return len(self.encode(False))
 
 
-    def encode(self, printStuff=True):
+    def encode(self):##, printStuff=True):
         """Returns the byte representation of the packet"""
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
         conv += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
         conv += str(self.data)
-        if printStuff:
-            print("Encoded {}-{} ({}) successfully.".format(self.packet_type,
-                                                            self.seq_no,
-                                                            self.data_len))
+        ##if printStuff:
+            ##print("Encoded {}-{} ({}) successfully.".format(self.packet_type,
+                                                            ##self.seq_no,
+                                                            ##self.data_len))
         return bytes(conv, "utf-8")
 
 
@@ -114,14 +114,14 @@ class Packet:
     def decode(self, data):
         """Sets the fields of this packet to that of data"""
         try:
-            #print("Attempting to deconvert", data)
+            ##print("Attempting to deconvert", data)
             data = data.decode()
             self.magic_no = int(data[:5])
             self.packet_type = int(data[5])
             self.seq_no = int(data[6])
             self.data_len = int(data[7:10])
             self.data = data[10:]
-            #print('Success! Created: {}'.format(self))
-            print("Successfully decoded the packet")
+            ##print('Success! Created: {}'.format(self))
+            ##print("Successfully decoded the packet")
         except:
             print("Error decoding data. Packet is unchanged.")

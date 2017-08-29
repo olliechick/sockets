@@ -32,21 +32,21 @@ def main(args):
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_in.bind((IP, in_port))
         socket_in.listen(2)
-        print("Started socket_in at port", in_port)
+        ##print("Started socket_in at port", in_port)
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create socket_in.")
 
     try:
         socket_out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_out.bind((IP, out_port))
-        print("Started socket_out at port", out_port)
+        ##print("Started socket_out at port", out_port)
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to create socket_out.")
 
     # Connect out port to channel sender in port
     try:
         socket_out.connect((IP, channel_in_port))
-        print("Connected socket_out to port", channel_in_port)
+        ##print("Connected socket_out to port", channel_in_port)
     except IOError: #If it fails give up and go home
         sys.exit("An IO Error occurred trying to connect socket_out. Port: {}".format(channel_in_port))
 
@@ -63,10 +63,10 @@ def main(args):
 
     # Main loop
     while True:
-        print("\n\n\nWaiting...", flush=True)
+        ##print("\n\n\nWaiting...", flush=True)
         readable, _, _ = select.select([socket_in], [], [])
         #got a response
-        print('got a response')
+        ##print('got a response')
 
         s = readable[0]
         data = s.recv(1024)
@@ -74,7 +74,7 @@ def main(args):
         rcvd.decode(data)
 
         if rcvd.magic_no == VALID_MAGIC_NO and rcvd.packet_type == packet.PTYPE_DATA:
-            print("Valid packet")
+            ##print("Valid packet")
 
             magic_no = VALID_MAGIC_NO
             packet_type = packet.PTYPE_ACK
@@ -84,14 +84,14 @@ def main(args):
             pack = packet.Packet(magic_no, packet_type, seq_no, data_len, data)
 
             socket_out.send(pack.encode())
-            print("Sent reply")
+            ##print("Sent reply")
 
             if rcvd.seq_no == expected:
                 expected = 1 - expected
                 if rcvd.data_len > 0:
                     file.write(rcvd.data)
                 else:
-                    print("WARNING! CLOSING SOCKETS!")
+                    ##print("WARNING! CLOSING SOCKETS!")
                     file.close()
                     socket_in.shutdown(socket.SHUT_RDWR)
                     socket_in.close()
@@ -102,7 +102,7 @@ def main(args):
 
         # else do NOTHING! just go back to the start of the loop
 
-    print("WARNING! CLOSING SOCKETS!")
+    ##print("WARNING! CLOSING SOCKETS!")
     file.close()
     socket_in.close()
     socket_out.close()
