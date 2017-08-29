@@ -11,7 +11,6 @@ from packet import Packet, MAGIC_NO, PTYPE_DATA, PTYPE_ACK
 from socket_generator import create_sending_socket, create_listening_socket
 
 BIT_ERR_RATE = 0.1
-IP = '127.0.0.1'
 
 
 def process_packet(data, drop_rate):

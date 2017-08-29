@@ -14,41 +14,10 @@
        decode()
        is_valid_ack()
 """
+
 PTYPE_DATA = 0
 PTYPE_ACK = 1
 MAGIC_NO = 0x497E
-
-def replant_seed(): ##just for testing
-    file = open('seed', 'r')
-    seed = int(file.read())
-    file.close()
-    seed += 1
-    file = open('seed', 'w')
-    file.write(str(seed))
-    file.close()
-
-
-def get_socket_numbers(): ##just for testing
-    #must be in the range [1024, 64000]
-    file = open('seed', 'r')
-    seed = int(file.read())
-    file.close()
-    seed = (seed%100)*10
-
-    sender_base  = 5000
-    channel_base = 2000
-    receiver_base= 8000
-
-    s_in = sender_base + seed
-    s_out = sender_base + 1 + seed
-    c_s_in = channel_base + seed
-    c_s_out = channel_base + 1 + seed
-    c_r_in = channel_base + 2 + seed
-    c_r_out = channel_base + 3 + seed
-    r_in = receiver_base + seed
-    r_out = receiver_base + 1 + seed
-
-    return (s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out)
 
 
 class Packet:
