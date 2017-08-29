@@ -10,7 +10,7 @@ import sys, socket, os, packet, select
 
 MAGIC_NO = 0x497E
 IP = '127.0.0.1'
-TIMEOUT = 3 #seconds
+TIMEOUT = 1 #seconds
 FILE_ENCODING = 'utf8'
 
 def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
@@ -128,9 +128,6 @@ def main(args):
                                            next_no)
 
         packets_sent += packets_used
-
-
-
 
     #clean up and close
     print("WARNING! CLOSING SOCKETS!")
