@@ -3,7 +3,7 @@
    A class to represent a packet of information.
 
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 29 August 2017
+   Date Modified: 30 August 2017
 
    Contains:
        __init__()
@@ -46,7 +46,7 @@ class Packet:
         s += 'Seq no: {}\n'.format(self.seq_no)
         s += 'Data len: {}\n'.format(self.data_len)
         s += 'Data: "{}"'.format(self.data)
-        return(s)
+        return s
 
 
     def __len__(self):

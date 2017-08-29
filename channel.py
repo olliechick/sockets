@@ -3,7 +3,7 @@
    A program for the COSC264-17S2 Assignment
 
    Authors: Samuel Pell and Ollie Chick
-   Date Modified: 29 August 2017
+   Date Modified: 30 August 2017
 """
 
 import socket, select, sys, packet, random
@@ -32,8 +32,7 @@ def process_packet(data, drop_rate):
         # drop packet by random chance
         return None
     elif random.uniform(0,1) < BIT_ERR_RATE:
-        # create a bit error by random chance
-        # increment data_len by 1, 2, ..., 9, or 10
+        # create a bit error by random chance (increase data len field randomly)
         p.data_len += random.randint(1, 10)
 
     return p.encode() # return the packet's byte conversion
@@ -56,7 +55,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
         for s in readable:
             data = s.recv(1024)
 
-            if data == b'': 
+            if data == b'':
                 # a socket sent out the null byte (indicating it has closed)
                 if s == recv_in:
                     # receiver has closed; stop watching it
@@ -80,7 +79,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
                         # came from sender, send to receiver
                         print("Forwarding data to receiver.")
                         recv_out.send(data_to_forward)
-                    else: 
+                    else:
                         # came from receiver, send to sender
                         print("Forwarding data to sender.")
                         sender_out.send(data_to_forward)
@@ -165,6 +164,6 @@ if __name__ == "__main__":
     # * the port number where the socket s_in should be found
     # * the port number where the socket r_in should be found
     # * a packet loss rate P such that 0 <= P < 1
-    
+
     args = sys.argv
     main(args)
