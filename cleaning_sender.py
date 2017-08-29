@@ -11,6 +11,7 @@ import sys, socket, os, packet, select
 MAGIC_NO = 0x497E
 IP = '127.0.0.1'
 TIMEOUT = 3 #seconds
+FILE_ENCODING = 'utf8'
 
 def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
     """
@@ -40,6 +41,7 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
             rcvd.decode(data)
 
             if rcvd.is_valid_ack(next_no):
+                #got a valid acknowledgement packet
                 next_no = 1 - next_no
                 return packets_sent, next_no
         else:
@@ -64,7 +66,7 @@ def main(args):
 
     packets_sent = 0
 
-    # Create sockets
+    # Create sockets and connect socket_out
     try:
         socket_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_in.bind((IP, in_port))
@@ -97,17 +99,17 @@ def main(args):
     file = open(filename, "rb")
     input("Please acknowledge on the channel that you have started the sender, then press enter.")
 
-
+    # Accept connection from channel
     socket_in, addr = socket_in.accept()
 
     # Outer loop
     while not exit_flag:
         print("\n\n\n")
-        # Read 512 bytes from filename
+        # Read 512 bytes from file
         data = file.read(512)
-        #print("Read data:", data)
-        print("Successfully read data")
-        data = data.decode('utf8')
+        ##print("Read data:", data)
+        print("Successfully read data.")
+        data = data.decode(FILE_ENCODING)
 
         # Prepare packet
         packet_type = packet.PTYPE_DATA
@@ -146,15 +148,9 @@ if __name__ == "__main__":
     # * a file name, indicating the file to send
     args = sys.argv
 
-    # Available files:
-    # Name          Size (characters)
-    #
-    # data.txt      1473
-    # small.txt     6
-
     filename = 'input'
 
-    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers()
-    args = ['sender.py', s_in, s_out, c_s_in, filename] ##this is just for testing
+    s_in, s_out, c_s_in, c_s_out, c_r_in, c_r_out, r_in, r_out = packet.get_socket_numbers() ##just for testing
+    args = ['sender.py', s_in, s_out, c_s_in, filename] ##just for testing
 
     main(args)
