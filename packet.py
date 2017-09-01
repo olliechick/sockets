@@ -13,6 +13,7 @@
        encode()
        decode()
        is_valid_ack()
+       is_valid_data()
 """
 
 PTYPE_DATA = 0
@@ -55,7 +56,7 @@ class Packet:
 
 
     def encode(self):
-        """Returns the byte representation of the packet"""
+        """ Returns the byte representation of the packet. """
         conv = str(self.magic_no)
         conv += str(self.packet_type)
         conv += str(self.seq_no)
@@ -66,7 +67,7 @@ class Packet:
 
 
     def decode(self, data):
-        """Sets the fields of this packet to that of data"""
+        """ Sets the fields of this packet to that of data. """
         try:
             data = data.decode()
             self.magic_no = int(data[:5])
@@ -93,7 +94,8 @@ class Packet:
         return valid_magic and valid_type and valid_length and valid_seq_no and valid_checksum
 
 
-    def is_valid_ack(self):
+    def is_valid_data(self):
+        """ Checks if the packet is a valid data packet. """
         valid_magic = self.magic_no == MAGIC_NO
         valid_type = self.packet_type == PTYPE_DATA
         valid_checksum = self.checksum == (self.magic_no + self.packet_type + \

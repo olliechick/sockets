@@ -53,7 +53,7 @@ def main(args):
         rcvd = Packet()
         rcvd.decode(data)
 
-        if rcvd.magic_no == MAGIC_NO and rcvd.packet_type == PTYPE_DATA:
+        if rcvd.is_valid_data():
             # got a valid data packet
             
             # Prepare an acknowledgement packet and send it
