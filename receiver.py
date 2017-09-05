@@ -93,9 +93,4 @@ if __name__ == "__main__":
     # * a file name, indicating where the received data should be stored
     
     args = sys.argv
-    file = open('seed', 'r')
-    seed = int(file.read())
-    file.close()
-    seed = (seed%10)*100
-    args = ['receiver.py', 15640+seed, 15641+seed, 15622+seed, 'rec.txt']
     main(args)

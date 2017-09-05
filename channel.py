@@ -167,13 +167,4 @@ if __name__ == "__main__":
     # * a packet loss rate P such that 0 <= P < 1
 
     args = sys.argv
-    file = open('seed', 'r')
-    seed = int(file.read())
-    file.close()
-    seed += 1
-    file = open('seed', 'w')
-    file.write(str(seed))
-    file.close()
-    seed = (seed%10)*100
-    args = ['channel.py', 15620+seed, 15621+seed, 15622+seed, 15623+seed, 15630+seed, 15640+seed, 0.05]
     main(args)

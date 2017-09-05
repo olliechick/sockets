@@ -123,9 +123,4 @@ if __name__ == "__main__":
     # * a file name, indicating the file whose contents should be sent
     
     args = sys.argv
-    file = open('seed', 'r')
-    seed = int(file.read())
-    file.close()
-    seed = (seed%10)*100
-    args = ['sender.py', 15630+seed, 15631+seed, 15620+seed, '51200bytes.txt']
     main(args)
