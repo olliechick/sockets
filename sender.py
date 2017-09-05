@@ -24,7 +24,6 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
     while True:
         # Send packet
         socket_out.send(bytes_to_send)
-        print("Packet sent...")
         packets_sent += 1
 
         # Await a response
@@ -32,7 +31,6 @@ def inner_loop(socket_out, socket_in, bytes_to_send, next_no):
 
         if readable:
             # got a response
-            print('Response received.')
             s = readable[0]
             data = s.recv(1024)
 
@@ -83,8 +81,10 @@ def main(args):
 
     # Accept connection from channel
     socket_in, addr = socket_in.accept()
+    print("Sending data...")
 
     # Outer loop
+    i = 0
     while not exit_flag:
         # Read 512 bytes from file
         data = file.read(512)
@@ -100,9 +100,11 @@ def main(args):
 
         # Inner loop
         bytes_to_send = pack.encode()
+        print("Sending datum {}".format(i), end = "\r")
         packets_used, next_no = inner_loop(socket_out, socket_in, bytes_to_send,
                                            next_no)
         packets_sent += packets_used
+        i+=1
 
     # Clean up and close
     file.close()
@@ -110,7 +112,7 @@ def main(args):
     socket_in.close()
     socket_out.shutdown(socket.SHUT_RDWR)
     socket_out.close()
-    print("Packets sent: {}".format(packets_sent))
+    print("\nData sent.\nPackets sent: {}".format(packets_sent))
 
 
 if __name__ == "__main__":
@@ -121,4 +123,9 @@ if __name__ == "__main__":
     # * a file name, indicating the file whose contents should be sent
     
     args = sys.argv
+    file = open('seed', 'r')
+    seed = int(file.read())
+    file.close()
+    seed = (seed%10)*100
+    args = ['sender.py', 15630+seed, 15631+seed, 15620+seed, '51200bytes.txt']
     main(args)

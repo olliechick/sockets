@@ -66,6 +66,7 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
 
                 if len(sockets_to_watch) == 0:
                     # sender and receiver have closed; exit loop
+                    print('\nChannel shut down.')
                     return
 
             elif len(sockets_to_watch) == 2:
@@ -77,11 +78,11 @@ def main_loop(sender_in, sender_out, recv_in, recv_out, drop_rate):
 
                     if s == sender_in:
                         # came from sender, send to receiver
-                        print("Forwarding data to receiver.")
+                        print("sender -> channel -> receiver", end = '\r')
                         recv_out.send(data_to_forward)
                     else:
                         # came from receiver, send to sender
-                        print("Forwarding data to sender.")
+                        print("sender <- channel <- receiver", end = '\r')
                         sender_out.send(data_to_forward)
 
 
@@ -166,4 +167,13 @@ if __name__ == "__main__":
     # * a packet loss rate P such that 0 <= P < 1
 
     args = sys.argv
+    file = open('seed', 'r')
+    seed = int(file.read())
+    file.close()
+    seed += 1
+    file = open('seed', 'w')
+    file.write(str(seed))
+    file.close()
+    seed = (seed%10)*100
+    args = ['channel.py', 15620+seed, 15621+seed, 15622+seed, 15623+seed, 15630+seed, 15640+seed, 0.05]
     main(args)

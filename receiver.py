@@ -43,11 +43,15 @@ def main(args):
 
     # Accept connection from channel
     socket_in, addr = socket_in.accept()
+    print("Receiving data...")
 
     # Main loop
+    i=0
     while True:
         readable, _, _ = select.select([socket_in], [], [])
         # got a response
+        print("Got packet {}".format(i), end = '\r')
+        i += 1
         s = readable[0]
         data = s.recv(1024)
         rcvd = Packet()
@@ -64,7 +68,6 @@ def main(args):
             data = ""
             pack = Packet(magic_no, packet_type, seq_no, data_len, data)
             socket_out.send(pack.encode())
-            print("Sent reply")
 
             if rcvd.seq_no == expected:
                 expected = 1 - expected
@@ -78,6 +81,7 @@ def main(args):
                     socket_in.close()
                     socket_out.shutdown(socket.SHUT_RDWR)
                     socket_out.close()
+                    print("\nData received.")
                     return
 
 
@@ -89,4 +93,9 @@ if __name__ == "__main__":
     # * a file name, indicating where the received data should be stored
     
     args = sys.argv
+    file = open('seed', 'r')
+    seed = int(file.read())
+    file.close()
+    seed = (seed%10)*100
+    args = ['receiver.py', 15640+seed, 15641+seed, 15622+seed, 'rec.txt']
     main(args)
