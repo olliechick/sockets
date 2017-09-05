@@ -5,7 +5,7 @@ To run the program, first run ``channel.py``, ``sender.py``, and ``receiver.py``
 * ``sender.py 15630 15631 15620 data.txt``
 * ``receiver.py 15640 15641 15622 rec.txt``
 
-Then click enter on ``channel.py``, then on ``sender.py`` and ``receiver.py``.
+Then click enter on ``channel.py``, then on ``receiver.py``, then on ``sender.py``.
 
 ## Checking validity
 
