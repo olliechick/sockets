@@ -1,5 +1,5 @@
 """
-Socket generator
+   Socket generator
    Program to generate sending and listening sockets.
    Authors: Samuel Pell and Ollie Chick
    Date modified: 29 August 2017
