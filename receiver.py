@@ -38,7 +38,7 @@ def main(args):
 
     # Initialisation
     expected = 0
-    file = open(filename, 'w')
+    file = open(filename, 'wb')
     input("Please acknowledge on the channel that you have started the receiver, then press enter.")
 
     # Accept connection from channel
@@ -65,7 +65,7 @@ def main(args):
             packet_type = PTYPE_ACK
             seq_no = rcvd.seq_no
             data_len = 0
-            data = ""
+            data = b""
             pack = Packet(magic_no, packet_type, seq_no, data_len, data)
             socket_out.send(pack.encode())
 

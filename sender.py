@@ -88,7 +88,7 @@ def main(args):
     while not exit_flag:
         # Read 512 bytes from file
         data = file.read(512)
-        data = data.decode(FILE_ENCODING)
+        ##data = data.decode(FILE_ENCODING)
 
         # Prepare packet
         packet_type = PTYPE_DATA

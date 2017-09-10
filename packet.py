@@ -19,6 +19,7 @@
 PTYPE_DATA = 0
 PTYPE_ACK = 1
 MAGIC_NO = 0x497E
+ENCODING = 'utf-8'
 
 
 class Packet:
@@ -57,25 +58,27 @@ class Packet:
 
     def encode(self):
         """ Returns the byte representation of the packet. """
-        conv = str(self.magic_no)
-        conv += str(self.packet_type)
-        conv += str(self.seq_no)
-        conv += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
-        conv += "0" * (3 - len(str(self.checksum))) + str(self.checksum)
-        conv += str(self.data)
-        return bytes(conv, "utf-8")
+        header = str(self.magic_no)
+        header += str(self.packet_type)
+        header += str(self.seq_no)
+        header += "0" * (3 - len(str(self.data_len))) + str(self.data_len)
+        header += "0" * (3 - len(str(self.checksum))) + str(self.checksum)
+        conv = bytes(header, ENCODING)
+        conv += self.data
+        return conv
 
 
     def decode(self, data):
         """ Sets the fields of this packet to that of data. """
         try:
-            data = data.decode()
+            ##print(data[:13])
+            data = data[:13].decode()
             self.magic_no = int(data[:5])
             self.packet_type = int(data[5])
             self.seq_no = int(data[6])
             self.data_len = int(data[7:10])
             self.checksum = int(data[10:13])
-            self.data = data[13:]
+            self.data = data[13:].encode()
         except:
             print("Error decoding data ({}). Packet is unchanged.".format(data))
 
