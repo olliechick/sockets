@@ -7,6 +7,8 @@ To run the program, first run ``channel.py``, ``sender.py``, and ``receiver.py``
 
 Then click enter on ``channel.py``, then on ``receiver.py``, then on ``sender.py``.
 
+Note that if rec.txt (or whatever file you have specified for receiver) exists, then the program will close.
+
 ## Checking validity
 
 To check that the two files are the same, run ``diff`` on the two files: e.g. ``diff data.txt rec.txt``.
