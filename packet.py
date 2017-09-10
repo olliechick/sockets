@@ -72,13 +72,13 @@ class Packet:
         """ Sets the fields of this packet to that of data. """
         try:
             ##print(data[:13])
+            self.data = data[13:]
             data = data[:13].decode()
             self.magic_no = int(data[:5])
             self.packet_type = int(data[5])
             self.seq_no = int(data[6])
             self.data_len = int(data[7:10])
             self.checksum = int(data[10:13])
-            self.data = data[13:].encode()
         except:
             print("Error decoding data ({}). Packet is unchanged.".format(data))
 
