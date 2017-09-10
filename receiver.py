@@ -46,7 +46,7 @@ def main(args):
     print("Receiving data...")
 
     # Main loop
-    i=0
+    i = 0
     while True:
         readable, _, _ = select.select([socket_in], [], [])
         # got a response
