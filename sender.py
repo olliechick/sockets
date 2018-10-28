@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
    A program to send packets to a channel.
    For a COSC264 assignment.

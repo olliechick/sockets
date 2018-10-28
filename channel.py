@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
    channel
    A program for the COSC264-17S2 Assignment

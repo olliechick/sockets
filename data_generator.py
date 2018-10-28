@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import random
 
 chars = [i for i in "abcdefghijklmnopqrstuvwxyzABCDEDFGHIJKLMNOPQRSTUVWXYZ1234567890`"]
