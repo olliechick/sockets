@@ -9,6 +9,8 @@ Then click enter on ``channel.py``, then on ``receiver.py``, then on ``sender.py
 
 Note that if rec.txt (or whatever file you have specified for receiver) exists, then the program will close.
 
+Also note that Windows isn't great at closing sockets, so to re-run the program, either change the socket numbers or restart your computer.
+
 ## Checking validity
 
 To check that the two files are the same, run ``diff`` on the two files: e.g. ``diff data.txt rec.txt``.
